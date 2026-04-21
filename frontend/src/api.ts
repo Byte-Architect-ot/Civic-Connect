@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.PROD ? '/_/backend/api' : '/api';
+const API_BASE = import.meta.env.PROD ? 'https://idt-lab.onrender.com/api' : '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('nagriksetu_token');
