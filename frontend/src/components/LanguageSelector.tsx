@@ -1,0 +1,94 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Globe, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+
+const LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'hi', name: 'हिंदी' },
+  { code: 'mr', name: 'मराठी' },
+  { code: 'es', name: 'Español' },
+  { code: 'fr', name: 'Français' },
+  { code: 'de', name: 'Deutsch' },
+  { code: 'ja', name: '日本語' }
+];
+
+export const LanguageSelector: React.FC = () => {
+  const { i18n } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLanguageChange = (code: string) => {
+    // 1. Change native i18next language
+    i18n.changeLanguage(code);
+    
+    // 2. Trigger Google Translate 
+    try {
+      const gtCombo = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+      if (gtCombo) {
+        gtCombo.value = code;
+        gtCombo.dispatchEvent(new Event('change'));
+      }
+    } catch (err) {
+      console.warn('Google Translate widget not ready', err);
+    }
+    
+    setIsOpen(false);
+  };
+
+  const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+      >
+        <Globe size={18} className="text-blue-600" />
+        {currentLang.name}
+        <ChevronDown size={16} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden"
+          >
+            {LANGUAGES.map((lng) => (
+              <button
+                key={lng.code}
+                onClick={() => handleLanguageChange(lng.code)}
+                className={`flex items-center justify-between w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 transition-colors ${
+                  i18n.language === lng.code ? 'text-blue-600 bg-blue-50/50' : 'text-slate-700'
+                }`}
+              >
+                <span>{lng.name}</span>
+                {i18n.language === lng.code && (
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                )}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Hidden google translate element container for injection */}
+      <div id="google_translate_element" className="hidden"></div>
+    </div>
+  );
+};

@@ -1,0 +1,7 @@
+{
+  "name": "NagrikSetu: Civic Issue Reporting System",
+  "description": "A crowdsourced platform for citizens to report and track civic issues like potholes, streetlights, and waste management, enabling faster resolution by local authorities.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
