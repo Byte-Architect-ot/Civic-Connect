@@ -7,9 +7,17 @@ const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // ─── Multer Configuration ──────────────────
+const fs = require('fs');
+const uploadDir = path.join(__dirname, '..', 'uploads');
+
+// Ensure uploads directory exists (crucial for deployed environments like Render)
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '..', 'uploads'));
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueName = Date.now() + '-' + file.originalname.replace(/\s+/g, '_');
