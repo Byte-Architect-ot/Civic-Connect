@@ -267,7 +267,7 @@ export default function App() {
         category: data.category,
         priority: data.priority,
         location: data.location,
-        imageUrl: data.imageUrl
+        imageFile: data.imageFile
       });
 
       // Add to local state immediately

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Clock, ThumbsUp, ChevronRight, AlertCircle, CheckCircle2, Timer, TrendingUp, User } from 'lucide-react';
 import { CivicIssue, IssueStatus, IssuePriority } from '../types';
+import { resolveImageUrl } from '../api';
 
 interface IssueCardProps {
   issue: CivicIssue;
@@ -34,7 +35,8 @@ const priorityColors: Record<IssuePriority, string> = {
 export const IssueCard: React.FC<IssueCardProps> = ({ issue, currentUserId, onClick, onUpvote }) => {
   const hasUpvoted = issue.upvotedBy?.includes(currentUserId);
   const timeAgo = getTimeAgo(issue.reportedAt);
-  const hasImage = issue.imageUrl;
+  const resolvedImageUrl = resolveImageUrl(issue.imageUrl);
+  const hasImage = !!resolvedImageUrl;
 
   const handleUpvoteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,7 +56,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, currentUserId, onCl
       {hasImage && (
         <div className="relative h-48 overflow-hidden bg-slate-100">
           <img 
-            src={issue.imageUrl} 
+            src={resolvedImageUrl} 
             alt={issue.title} 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             referrerPolicy="no-referrer"

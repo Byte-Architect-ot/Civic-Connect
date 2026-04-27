@@ -104,6 +104,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-03-28T19:45:00Z',
     upvotes: 28,
     upvotedBy: ['u1'],
+    imageUrl: 'https://images.unsplash.com/photo-1517347671033-f0f4383bb8a2?auto=format&fit=crop&q=80&w=800',
     updates: [
       {
         id: 'up2',
@@ -146,6 +147,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-05T11:00:00Z',
     upvotes: 15,
     upvotedBy: ['u1'],
+    imageUrl: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'Building Permission Department'
   },
   {
@@ -162,6 +164,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-04T09:15:00Z',
     upvotes: 120,
     upvotedBy: ['u1', 'u2'],
+    imageUrl: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'Municipal Corporation',
     expectedResolutionDate: '2026-04-06T00:00:00Z',
     updates: [
@@ -205,6 +208,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-07T11:45:00Z',
     upvotes: 18,
     upvotedBy: ['u2'],
+    imageUrl: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'Electricity Board'
   },
   {
@@ -221,6 +225,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-07T16:20:00Z',
     upvotes: 52,
     upvotedBy: ['u1', 'u2'],
+    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'Animal Control Department'
   },
   {
@@ -237,6 +242,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-08T07:30:00Z',
     upvotes: 23,
     upvotedBy: ['u2'],
+    imageUrl: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'Water Supply Department'
   },
   {
@@ -253,6 +259,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-08T10:00:00Z',
     upvotes: 89,
     upvotedBy: ['u1', 'u2'],
+    imageUrl: 'https://images.unsplash.com/photo-1545179605-1296651e9c43?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'National Highways Authority'
   },
   {
@@ -269,6 +276,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-09T09:30:00Z',
     upvotes: 41,
     upvotedBy: ['u1'],
+    imageUrl: 'https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'Municipal Corporation',
     updates: [
       {
@@ -294,6 +302,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-10T14:00:00Z',
     upvotes: 156,
     upvotedBy: ['u1', 'u2'],
+    imageUrl: 'https://images.unsplash.com/photo-1548438294-1ad5d5f4f063?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'MSBTE'
   },
   {
@@ -310,6 +319,7 @@ export const MOCK_ISSUES: CivicIssue[] = [
     reportedAt: '2026-04-11T08:15:00Z',
     upvotes: 210,
     upvotedBy: ['u1', 'u2'],
+    imageUrl: 'https://images.unsplash.com/photo-1621451537084-482c73073a0f?auto=format&fit=crop&q=80&w=800',
     assignedTo: 'Health & Water Department'
   }
 ];
@@ -317,8 +327,8 @@ export const MOCK_ISSUES: CivicIssue[] = [
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: 'n1',
-    title: 'Issue Resolved',
-    message: 'Your report "Streetlight Not Working" has been successfully resolved by the authorities.',
+    title: 'Issue Resolved — Streetlight Not Working',
+    message: 'Great news! Your report "Streetlight Not Working" in Rajapeth, Amravati has been resolved. All 8 streetlights are now functional.',
     type: 'StatusUpdate',
     timestamp: '2026-03-30T11:15:00Z',
     isRead: false,
@@ -327,8 +337,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     id: 'n2',
-    title: 'New Update',
-    message: 'Mayur More added a comment to "Large Pothole on Miraj Road".',
+    title: 'Work Started — Pothole Repair',
+    message: 'Mayur More posted an update on "Large Pothole on Miraj Road": Repair crew scheduled for tomorrow 6 AM. Road closure 6 AM – 12 PM.',
     type: 'StatusUpdate',
     timestamp: '2026-04-02T09:00:00Z',
     isRead: true,
@@ -337,17 +347,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     id: 'n3',
-    title: 'System Maintenance',
-    message: 'NagrikSetu will undergo scheduled maintenance on Sunday from 2:00 AM to 4:00 AM IST.',
-    type: 'System',
-    timestamp: '2026-04-05T10:00:00Z',
-    isRead: false,
-    priority: 'Normal'
-  },
-  {
-    id: 'n4',
-    title: 'High Priority Issue',
-    message: 'Your report "Water Leakage from Main Pipe" has been marked as Critical priority.',
+    title: 'Critical: Water Leakage Reported',
+    message: 'Your report "Water Leakage from Main Pipe" at CIDCO, Nanded has been classified as Critical priority and forwarded to Water Supply Department.',
     type: 'StatusUpdate',
     timestamp: '2026-04-05T08:30:00Z',
     isRead: false,
@@ -355,13 +356,73 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     priority: 'High'
   },
   {
+    id: 'n4',
+    title: 'Emergency Barricades Placed — Open Manhole',
+    message: 'Mayur More posted an update on "Open Manhole Cover Missing": Barricades placed around the manhole. Permanent cover installation within 48 hours.',
+    type: 'StatusUpdate',
+    timestamp: '2026-04-04T12:30:00Z',
+    isRead: false,
+    issueId: 'i6',
+    priority: 'High'
+  },
+  {
     id: 'n5',
-    title: 'Popular Report',
-    message: 'Your report "Open Manhole Cover Missing" has received 100+ upvotes.',
+    title: 'Popular Report — 100+ Upvotes',
+    message: 'Your report "Open Manhole Cover Missing" in Main Market, Miraj has received 120 upvotes from concerned citizens.',
     type: 'Upvote',
     timestamp: '2026-04-06T14:00:00Z',
     isRead: true,
     issueId: 'i6',
     priority: 'Normal'
+  },
+  {
+    id: 'n6',
+    title: 'Cleanup In Progress — Overflowing Dustbins',
+    message: 'Garbage truck dispatched to Main Market, Nanded for "Overflowing Dustbins near Market". Expected cleanup by 2 PM today.',
+    type: 'StatusUpdate',
+    timestamp: '2026-04-09T11:05:00Z',
+    isRead: false,
+    issueId: 'i12',
+    priority: 'Normal'
+  },
+  {
+    id: 'n7',
+    title: 'Critical: Low Hanging Power Lines',
+    message: 'Your report "Low Hanging Power Lines" near the school in Vishrambagh has been forwarded to MSBTE as Critical priority. 156 citizens have upvoted.',
+    type: 'StatusUpdate',
+    timestamp: '2026-04-10T14:30:00Z',
+    isRead: false,
+    issueId: 'i13',
+    priority: 'High'
+  },
+  {
+    id: 'n8',
+    title: 'Health Alert — Contaminated Water',
+    message: 'Your report "Contaminated Water Supply" in Rajarampuri, Kolhapur has been classified as Critical and assigned to Health & Water Department. 210 citizens support this issue.',
+    type: 'StatusUpdate',
+    timestamp: '2026-04-11T08:45:00Z',
+    isRead: false,
+    issueId: 'i14',
+    priority: 'High'
+  },
+  {
+    id: 'n9',
+    title: 'Trending — Stray Dog Menace',
+    message: 'Your report "Stray Dog Menace" near City Park, Nanded has gained 50+ upvotes. Animal Control Department has been notified.',
+    type: 'Upvote',
+    timestamp: '2026-04-08T10:00:00Z',
+    isRead: true,
+    issueId: 'i9',
+    priority: 'Normal'
+  },
+  {
+    id: 'n10',
+    title: 'Critical: Broken Highway Divider',
+    message: 'Your report "Broken Divider on Highway" at Bypass Road, Amravati is pending with Critical priority. National Highways Authority has been assigned.',
+    type: 'StatusUpdate',
+    timestamp: '2026-04-08T10:30:00Z',
+    isRead: false,
+    issueId: 'i11',
+    priority: 'High'
   }
 ];

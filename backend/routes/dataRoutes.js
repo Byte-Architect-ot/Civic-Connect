@@ -1,24 +1,55 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const Hazard = require('../models/Hazard');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Create a new hazard report
-router.post('/', authMiddleware, async (req, res) => {
+// ─── Multer Configuration ──────────────────
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '..', 'uploads'));
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + '-' + file.originalname.replace(/\s+/g, '_');
+    cb(null, uniqueName);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Unsupported file format. Only JPEG, PNG, and WebP are allowed.'), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
+
+// Create a new hazard report (with optional image upload)
+router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const { title, description, category, priority, location, imageUrl, lat, lng } = req.body;
-    
+    const { title, description, category, priority, location, lat, lng } = req.body;
+
+    // If a file was uploaded, store its server path; otherwise empty string
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+
     const newHazard = new Hazard({
       title,
       description,
       category: category || 'Others',
       priority: priority || 'Medium',
       location: location || '',
-      imageUrl: imageUrl || '',
+      imageUrl,
       lat: lat || (16.8 + Math.random() * 0.1),
       lng: lng || (74.5 + Math.random() * 0.2),
       status: 'Pending',
@@ -32,6 +63,16 @@ router.post('/', authMiddleware, async (req, res) => {
     const savedHazard = await newHazard.save();
     res.status(201).json(savedHazard.toJSON());
   } catch (error) {
+    // Handle multer-specific errors
+    if (error instanceof multer.MulterError) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'File too large. Maximum size is 5MB.' });
+      }
+      return res.status(400).json({ message: error.message });
+    }
+    if (error.message && error.message.includes('Unsupported file format')) {
+      return res.status(400).json({ message: error.message });
+    }
     console.error('Create hazard error:', error);
     res.status(500).json({ message: 'Server error while creating report' });
   }

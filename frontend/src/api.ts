@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.PROD ? 'https://idt-lab.onrender.com/api' : '/api';
+export const API_BASE = import.meta.env.PROD ? 'https://idt-lab.onrender.com' : '';
+
+const API_PATH = import.meta.env.PROD ? 'https://idt-lab.onrender.com/api' : '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('nagriksetu_token');
@@ -23,9 +25,33 @@ async function request(endpoint: string, options: RequestInit = {}): Promise<any
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
+  const res = await fetch(`${API_PATH}${endpoint}`, {
     ...options,
     headers
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || 'Request failed');
+  }
+
+  return data;
+}
+
+async function requestFormData(endpoint: string, formData: FormData): Promise<any> {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  // Do NOT set Content-Type — browser auto-sets multipart/form-data with boundary
+  const res = await fetch(`${API_PATH}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body: formData
   });
 
   const data = await res.json();
@@ -112,12 +138,20 @@ export async function apiCreateHazard(hazard: {
   category: string;
   priority: string;
   location: string;
-  imageUrl?: string;
+  imageFile?: File;
 }) {
-  return await request('/data', {
-    method: 'POST',
-    body: JSON.stringify(hazard)
-  });
+  const formData = new FormData();
+  formData.append('title', hazard.title);
+  formData.append('description', hazard.description);
+  formData.append('category', hazard.category);
+  formData.append('priority', hazard.priority);
+  formData.append('location', hazard.location);
+
+  if (hazard.imageFile) {
+    formData.append('image', hazard.imageFile);
+  }
+
+  return await requestFormData('/data', formData);
 }
 
 export async function apiUpdateHazardStatus(id: string, status: string, comment: string) {
@@ -138,3 +172,17 @@ export async function apiDeleteHazard(id: string) {
     method: 'DELETE'
   });
 }
+
+// ─── Helpers ──────────────────────────────
+
+/** Resolve an imageUrl to its full display URL (handles both server paths and external URLs) */
+export function resolveImageUrl(imageUrl?: string): string | undefined {
+  if (!imageUrl) return undefined;
+  // Already a full URL (old data or external)
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+  // Server-relative path like /uploads/filename.jpg
+  return `${API_BASE}${imageUrl}`;
+}
+

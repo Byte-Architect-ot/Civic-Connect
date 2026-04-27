@@ -5,6 +5,7 @@ import {
   Timer, ThumbsUp, Calendar, TrendingUp, FileText, Image as ImageIcon 
 } from 'lucide-react';
 import { CivicIssue, IssueStatus, IssueUpdate } from '../types';
+import { resolveImageUrl } from '../api';
 
 interface IssueDetailProps {
   issue: CivicIssue;
@@ -148,10 +149,10 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
               </div>
 
               {/* Image */}
-              {issue.imageUrl && (
+              {resolveImageUrl(issue.imageUrl) && (
                 <div className="rounded-3xl overflow-hidden border border-slate-200 shadow-lg">
                   <img 
-                    src={issue.imageUrl} 
+                    src={resolveImageUrl(issue.imageUrl)} 
                     alt={issue.title} 
                     className="w-full h-80 object-cover" 
                     referrerPolicy="no-referrer" 
@@ -348,10 +349,10 @@ function UpdateCard({ update, isLatest }: { update: IssueUpdate, isLatest: boole
           Status: {update.status}
         </div>
 
-        {update.imageUrl && (
+        {resolveImageUrl(update.imageUrl) && (
           <div className="mt-4 rounded-xl overflow-hidden border border-slate-200">
             <img 
-              src={update.imageUrl} 
+              src={resolveImageUrl(update.imageUrl)} 
               alt="Update" 
               className="w-full h-48 object-cover" 
               referrerPolicy="no-referrer"
