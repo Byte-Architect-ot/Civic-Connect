@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { 
   BarChart3, TrendingUp, TrendingDown, Calendar, 
   CheckCircle2, Clock, AlertCircle, Users, MapPin,
-  PieChart, Activity, Award
+  PieChart, Activity, Award, Map, Trash2, Droplets, Zap, HeartPulse, FileText
 } from 'lucide-react';
 import { CivicIssue, User, IssueCategory } from '../types';
 
@@ -378,18 +378,18 @@ function ProgressBar({
 }
 
 function CategoryCard({ category, count }: { category: IssueCategory, count: number, key?: string }) {
-  const categoryIcons = {
-    'Roads': '🛣️',
-    'Garbage': '🗑️',
-    'Water': '💧',
-    'Electricity': '⚡',
-    'Public Health': '🏥',
-    'Others': '📋'
+  const categoryIcons: Record<IssueCategory, React.ReactNode> = {
+    'Roads': <Map size={28} className="text-blue-500" />,
+    'Garbage': <Trash2 size={28} className="text-emerald-500" />,
+    'Water': <Droplets size={28} className="text-cyan-500" />,
+    'Electricity': <Zap size={28} className="text-amber-500" />,
+    'Public Health': <HeartPulse size={28} className="text-rose-500" />,
+    'Others': <FileText size={28} className="text-slate-500" />
   };
 
   return (
     <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all">
-      <div className="text-3xl mb-2">{categoryIcons[category]}</div>
+      <div className="mb-3">{categoryIcons[category]}</div>
       <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{category}</p>
       <p className="text-2xl font-black text-slate-900">{count}</p>
     </div>

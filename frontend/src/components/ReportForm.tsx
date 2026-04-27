@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Upload, MapPin, AlertTriangle, Camera, FileText, Tag, TrendingUp, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
 import { IssueCategory, IssuePriority } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface ReportFormProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmit }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -229,16 +231,16 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-3xl shadow-2xl z-50 overflow-hidden max-h-[90vh] flex flex-col"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed left-0 bottom-0 sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 w-full sm:w-[95%] md:w-full max-w-2xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl z-50 overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col"
           >
             {/* Header */}
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50">
               <div>
-                <h2 className="text-2xl font-black text-slate-900">Report an Issue</h2>
-                <p className="text-sm text-slate-600 font-medium">Help improve your community</p>
+                <h2 className="text-xl md:text-2xl font-black text-slate-900">{t('Report an Issue')}</h2>
+                <p className="text-xs md:text-sm text-slate-600 font-medium">{t('Help improve your community')}</p>
               </div>
               <button 
                 onClick={handleClose} 
@@ -250,26 +252,26 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+            <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-5 overflow-y-auto flex-1">
               {/* Issue Title */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
                   <FileText size={16} />
-                  Issue Title
+                  {t('Issue Title')}
                   <span className="text-rose-500">*</span>
                 </label>
                 <input
                   required
                   type="text"
-                  placeholder="e.g., Large pothole on Main Street near traffic signal"
-                  className={`w-full px-4 py-3 rounded-xl border-2 ${
+                  placeholder={t('e.g., Large pothole on Main Street near traffic signal')}
+                  className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 ${
                     errors.title ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium`}
+                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium text-sm`}
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
                 />
                 {errors.title && (
-                  <p className="text-rose-600 text-xs font-medium mt-1 flex items-center gap-1">
+                  <p className="text-rose-600 text-[10px] md:text-xs font-medium mt-1 flex items-center gap-1">
                     <AlertTriangle size={12} />
                     {errors.title}
                   </p>
@@ -277,14 +279,14 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
               </div>
 
               {/* Category and Priority */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-slate-200/50 p-3 sm:border-none sm:p-0 rounded-2xl">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                  <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
                     <Tag size={16} />
-                    Category
+                    {t('Category')}
                   </label>
                   <select
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium text-sm"
                     value={formData.category}
                     onChange={e => setFormData({ ...formData, category: e.target.value as IssueCategory })}
                   >
@@ -295,12 +297,12 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
                 </div>
                 
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                  <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
                     <TrendingUp size={16} />
-                    Priority Level
+                    {t('Priority Level')}
                   </label>
                   <select
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium text-sm"
                     value={formData.priority}
                     onChange={e => setFormData({ ...formData, priority: e.target.value as IssuePriority })}
                   >
@@ -313,23 +315,23 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
 
               {/* Location */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
                   <MapPin size={16} />
-                  Location
+                  {t('Location')}
                   <span className="text-rose-500">*</span>
                 </label>
                 <input
                   required
                   type="text"
-                  placeholder="Specific area, landmark, or street name"
-                  className={`w-full px-4 py-3 rounded-xl border-2 ${
+                  placeholder={t('Specific area, landmark, or street name')}
+                  className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 ${
                     errors.location ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium`}
+                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium text-sm`}
                   value={formData.location}
                   onChange={e => setFormData({ ...formData, location: e.target.value })}
                 />
                 {errors.location && (
-                  <p className="text-rose-600 text-xs font-medium mt-1 flex items-center gap-1">
+                  <p className="text-rose-600 text-[10px] md:text-xs font-medium mt-1 flex items-center gap-1">
                     <AlertTriangle size={12} />
                     {errors.location}
                   </p>
@@ -338,29 +340,29 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
 
               {/* Description */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
                   <FileText size={16} />
-                  Detailed Description
+                  {t('Detailed Description')}
                   <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   required
                   rows={4}
-                  placeholder="Describe the issue in detail. Include information about how long it's been present, severity, and impact on the community..."
-                  className={`w-full px-4 py-3 rounded-xl border-2 ${
+                  placeholder={t("Describe the issue in detail. Include information about how long it's been present, severity, and impact on the community...")}
+                  className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 ${
                     errors.description ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none font-medium`}
+                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none font-medium text-sm`}
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
                 />
                 <div className="flex justify-between items-center mt-1">
                   {errors.description ? (
-                    <p className="text-rose-600 text-xs font-medium flex items-center gap-1">
+                    <p className="text-rose-600 text-[10px] md:text-xs font-medium flex items-center gap-1">
                       <AlertTriangle size={12} />
                       {errors.description}
                     </p>
                   ) : (
-                    <p className="text-slate-400 text-xs font-medium">
+                    <p className="text-slate-400 text-[10px] md:text-xs font-medium">
                       {formData.description.length} characters
                     </p>
                   )}
@@ -368,11 +370,11 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
               </div>
 
               {/* ─── Image Upload Section ─── */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
+              <div className="bg-slate-50/50 p-3 md:p-4 rounded-2xl border border-slate-100">
+                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3">
                   <ImageIcon size={16} />
-                  Attach Photo
-                  <span className="text-slate-400 font-normal text-xs">(Optional)</span>
+                  {t('Attach Photo')}
+                  <span className="text-slate-400 font-normal text-[10px] md:text-xs">{t('(Optional)')}</span>
                 </label>
 
                 {/* Hidden file inputs */}
@@ -402,32 +404,32 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mb-4 rounded-2xl overflow-hidden border-2 border-blue-300 bg-black"
+                      className="mb-3 md:mb-4 rounded-2xl overflow-hidden border-2 border-blue-300 bg-black"
                     >
                       <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="w-full h-64 object-cover"
+                         ref={videoRef}
+                         autoPlay
+                         playsInline
+                         muted
+                         className="w-full h-48 md:h-64 object-cover"
                       />
-                      <div className="flex gap-3 p-3 bg-slate-900">
+                      <div className="flex gap-2 p-2 md:gap-3 md:p-3 bg-slate-900">
                         <button
                           type="button"
                           onClick={handleCapturePhoto}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
+                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 md:px-4 md:py-2.5 bg-blue-600 text-white rounded-xl text-sm md:text-base font-bold hover:bg-blue-700 transition-colors"
                           aria-label="Capture photo"
                         >
                           <Camera size={18} />
-                          Capture
+                          {t('Capture')}
                         </button>
                         <button
                           type="button"
                           onClick={stopCamera}
-                          className="px-4 py-2.5 bg-slate-700 text-white rounded-xl font-bold hover:bg-slate-600 transition-colors"
+                          className="px-3 py-2 md:px-4 md:py-2.5 bg-slate-700 text-white rounded-xl text-sm md:text-base font-bold hover:bg-slate-600 transition-colors"
                           aria-label="Cancel camera"
                         >
-                          Cancel
+                          {t('Cancel')}
                         </button>
                       </div>
                     </motion.div>
@@ -439,16 +441,16 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="mb-4 relative group"
+                    className="mb-3 md:mb-4 relative group"
                   >
                     <div className="rounded-2xl overflow-hidden border-2 border-emerald-200 bg-slate-50">
                       <img
                         src={imagePreview}
                         alt="Selected image preview"
-                        className="w-full h-48 object-cover"
+                        className="w-full h-40 md:h-48 object-cover"
                       />
-                      <div className="flex items-center justify-between px-4 py-2.5 bg-emerald-50 border-t border-emerald-200">
-                        <div className="flex items-center gap-2 text-emerald-700 text-xs font-bold min-w-0">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-3 py-2 md:px-4 md:py-2.5 bg-emerald-50 border-t border-emerald-200">
+                        <div className="flex items-center gap-2 text-emerald-700 text-[10px] md:text-xs font-bold min-w-0 w-full sm:w-auto">
                           <ImageIcon size={14} className="shrink-0" />
                           <span className="truncate">{imageFile?.name}</span>
                           <span className="text-emerald-500 shrink-0">
@@ -458,11 +460,11 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
                         <button
                           type="button"
                           onClick={handleRemoveImage}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold hover:bg-rose-200 transition-colors shrink-0"
+                          className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-1.5 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold hover:bg-rose-200 transition-colors shrink-0"
                           aria-label="Remove selected image"
                         >
                           <Trash2 size={12} />
-                          Remove
+                          {t('Remove')}
                         </button>
                       </div>
                     </div>
@@ -471,35 +473,37 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
 
                 {/* Upload & Camera Buttons */}
                 {!imagePreview && !isCameraOpen && (
-                  <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="grid grid-cols-2 gap-2 md:gap-3 mb-2 md:mb-3">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center justify-center gap-2.5 px-4 py-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-slate-600 font-bold hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all group"
+                      className="flex items-center justify-center gap-2 md:gap-2.5 px-2 md:px-4 py-3 md:py-4 border-2 border-dashed border-slate-300 rounded-2xl bg-white text-slate-600 font-bold hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all group shadow-sm"
                       aria-label="Upload image from device"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:border-blue-200 transition-colors">
-                        <Upload size={20} />
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:border-blue-200 transition-colors shrink-0">
+                        <Upload size={18} className="md:w-5 md:h-5" />
                       </div>
-                      <div className="text-left">
-                        <p className="text-sm font-bold">Upload from Device</p>
-                        <p className="text-[10px] text-slate-400 font-medium">Browse files</p>
+                      <div className="text-left hidden sm:block">
+                        <p className="text-xs md:text-sm font-bold">{t('Upload from Device')}</p>
+                        <p className="text-[9px] md:text-[10px] text-slate-400 font-medium">{t('Browse files')}</p>
                       </div>
+                      <span className="sm:hidden text-xs font-bold leading-tight">{t('Upload')}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={handleCameraClick}
-                      className="flex items-center justify-center gap-2.5 px-4 py-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-slate-600 font-bold hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all group"
+                      className="flex items-center justify-center gap-2 md:gap-2.5 px-2 md:px-4 py-3 md:py-4 border-2 border-dashed border-slate-300 rounded-2xl bg-white text-slate-600 font-bold hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all group shadow-sm"
                       aria-label="Take photo with camera"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 group-hover:border-indigo-200 transition-colors">
-                        <Camera size={20} />
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 group-hover:border-indigo-200 transition-colors shrink-0">
+                        <Camera size={18} className="md:w-5 md:h-5" />
                       </div>
-                      <div className="text-left">
-                        <p className="text-sm font-bold">Take Photo</p>
-                        <p className="text-[10px] text-slate-400 font-medium">Use camera</p>
+                      <div className="text-left hidden sm:block">
+                        <p className="text-xs md:text-sm font-bold">{t('Take Photo')}</p>
+                        <p className="text-[9px] md:text-[10px] text-slate-400 font-medium">{t('Use camera')}</p>
                       </div>
+                      <span className="sm:hidden text-xs font-bold leading-tight">{t('Camera')}</span>
                     </button>
                   </div>
                 )}
@@ -509,41 +513,41 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-2 p-3 bg-rose-50 border border-rose-200 rounded-xl mb-3"
+                    className="flex items-start gap-2 p-2 md:p-3 bg-rose-50 border border-rose-200 rounded-xl mb-2 md:mb-3"
                   >
-                    <AlertTriangle size={16} className="text-rose-500 shrink-0 mt-0.5" />
-                    <p className="text-rose-600 text-xs font-medium">{imageError}</p>
+                    <AlertTriangle size={14} className="text-rose-500 shrink-0 mt-0.5 md:w-4 md:h-4" />
+                    <p className="text-rose-600 text-[10px] md:text-xs font-medium">{imageError}</p>
                   </motion.div>
                 )}
 
                 {/* Format hint */}
-                <p className="text-[11px] text-slate-400 font-medium">
-                  Accepted formats: JPEG, PNG, WebP &bull; Max size: 5MB
+                <p className="text-[9px] md:text-[11px] text-slate-400 font-medium text-center sm:text-left">
+                  {t('Accepted formats: JPEG, PNG, WebP • Max size: 5MB')}
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 md:gap-3 pt-2 md:pt-4">
                 <button
                   type="button"
                   onClick={handleClose}
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-colors border-2 border-slate-200 disabled:opacity-50"
+                  className="w-1/3 px-2 md:px-6 py-3 rounded-xl font-bold text-sm md:text-base text-slate-600 hover:bg-slate-100 transition-colors border-2 border-slate-200 disabled:opacity-50"
                 >
-                  Cancel
+                  {t('Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-2/3 flex-1 px-4 md:px-6 py-3 rounded-xl font-bold text-sm md:text-base text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 size={18} className="animate-spin" />
-                      Uploading...
+                      <Loader2 size={16} className="animate-spin md:w-[18px] md:h-[18px]" />
+                      {t('Uploading...')}
                     </>
                   ) : (
-                    'Submit Report'
+                    t('Submit Report')
                   )}
                 </button>
               </div>

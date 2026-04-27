@@ -7,12 +7,14 @@ import {
 import { AuthModal } from './AuthModal';
 import { User } from '../types';
 import { LanguageSelector } from './LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 interface LandingPageProps {
   onLogin: (user: User) => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
+  const { t } = useTranslation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
@@ -24,35 +26,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-200 px-8 h-20 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
-            <Shield size={28} />
+      <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-200 px-4 md:px-8 h-20 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+            <Shield size={24} className="md:w-7 md:h-7" />
           </div>
-          <span className="font-black text-2xl tracking-tighter text-slate-900">NagrikSetu</span>
+          <span className="font-black text-xl md:text-2xl tracking-tighter text-slate-900">NagrikSetu</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <LanguageSelector />
           <button 
             onClick={() => openAuth('signin')}
-            className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors"
+            className="hidden sm:block px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors"
           >
-            Sign In
+            {t('Sign In')}
           </button>
           <button 
             onClick={() => openAuth('signup')}
-            className="px-6 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200"
+            className="px-4 py-2 md:px-6 md:py-3 bg-slate-900 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200"
           >
-            Get Started
+            {t('Get Started')}
           </button>
         </div>
       </nav>
 
       {/* Hero Section */}
       <main className="pt-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-5rem)]">
           {/* Left Content */}
-          <div className="p-12 lg:p-24 flex flex-col justify-center space-y-8">
+          <div className="p-6 md:p-12 lg:p-24 flex flex-col justify-center space-y-6 md:space-y-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -62,20 +64,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="inline-block px-4 py-2 bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest rounded-full mb-6 border border-blue-100"
+                className="inline-block px-3 py-1.5 md:px-4 md:py-2 bg-blue-50 text-blue-600 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-full mb-4 md:mb-6 border border-blue-100"
               >
-                Empowering Citizens, Improving Cities
+                {t('Empowering Citizens, Improving Cities')}
               </motion.span>
               
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-6xl lg:text-7xl font-black leading-[0.9] tracking-tighter text-slate-900 mb-8"
+                className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] md:leading-[0.9] tracking-tighter text-slate-900 mb-6 md:mb-8"
               >
-                Bridge the Gap. <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                  Build the Future.
+                {t('Bridge the Gap.')} <br className="hidden sm:block" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 inline-block mt-2">
+                  {t('Build the Future.')}
                 </span>
               </motion.h1>
               
@@ -83,29 +85,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-xl text-slate-600 font-medium max-w-lg leading-relaxed mb-10"
+                className="text-base md:text-xl text-slate-600 font-medium max-w-lg leading-relaxed mb-8 md:mb-10"
               >
-                NagrikSetu is a powerful crowdsourced civic issue reporting platform that connects citizens directly with local authorities for faster resolution and transparent governance.
+                {t('NagrikSetu is a powerful crowdsourced civic issue reporting platform that connects citizens directly with local authorities for faster resolution and transparent governance.')}
               </motion.p>
               
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row gap-3 md:gap-4"
               >
                 <button 
                   onClick={() => openAuth('signup')}
-                  className="flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95 group"
+                  className="flex items-center justify-center gap-3 px-6 py-3 md:px-8 md:py-4 bg-blue-600 text-white rounded-2xl font-bold text-base md:text-lg hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95 group"
                 >
-                  Get Started Now
+                  {t('Get Started Now')}
                   <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button 
                   onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="flex items-center justify-center gap-3 px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all"
+                  className="flex items-center justify-center gap-3 px-6 py-3 md:px-8 md:py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold text-base md:text-lg hover:bg-slate-50 transition-all"
                 >
-                  Learn More
+                  {t('Learn More')}
                 </button>
               </motion.div>
             </motion.div>
@@ -115,16 +117,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="grid grid-cols-3 gap-8 pt-12 border-t border-slate-200"
+              className="grid grid-cols-3 gap-4 md:gap-8 pt-8 md:pt-12 border-t border-slate-200"
             >
-              <StatItem label="Active Users" value="10k+" icon={<Users size={20} />} />
-              <StatItem label="Issues Resolved" value="5k+" icon={<CheckCircle2 size={20} />} />
-              <StatItem label="Cities" value="12+" icon={<Globe size={20} />} />
+              <StatItem label={t('Active Users')} value="10k+" icon={<Users size={20} className="w-4 h-4 md:w-5 md:h-5" />} />
+              <StatItem label={t('Issues Resolved')} value="5k+" icon={<CheckCircle2 size={20} className="w-4 h-4 md:w-5 md:h-5" />} />
+              <StatItem label={t('Cities')} value="12+" icon={<Globe size={20} className="w-4 h-4 md:w-5 md:h-5" />} />
             </motion.div>
           </div>
 
           {/* Right Visual Section */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex items-center justify-center p-12 lg:p-24">
+          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex items-center justify-center p-6 md:p-12 lg:p-24 min-h-[400px]">
             {/* Decorative Grid */}
             <div className="absolute inset-0 opacity-10" 
                  style={{ 
@@ -138,74 +140,45 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="relative z-10 w-full max-w-lg"
+              className="relative z-10 w-full max-w-sm md:max-w-lg"
             >
               {/* Main Card */}
               <motion.div 
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="bg-white rounded-3xl shadow-2xl p-8 space-y-6"
+                className="bg-white rounded-3xl shadow-2xl p-5 md:p-8 space-y-4 md:space-y-6"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-                      <CheckCircle2 size={28} />
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
+                      <CheckCircle2 size={24} className="md:w-7 md:h-7" />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-900">Issue Resolved</p>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Miraj Road, Sangli</p>
+                      <p className="text-xs md:text-sm font-black text-slate-900">{t('Issue Resolved')}</p>
+                      <p className="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-wider">{t('Miraj Road, Sangli')}</p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-slate-400">2m ago</span>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-400">{t('2m ago')}</span>
                 </div>
                 
-                <div className="h-48 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl overflow-hidden flex items-center justify-center relative">
+                <div className="h-32 md:h-48 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl overflow-hidden flex items-center justify-center relative">
                   {/* Static SVG City Illustration */}
-                  <svg viewBox="0 0 400 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    {/* Sky */}
+                  <svg viewBox="0 0 400 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
                     <defs>
                       <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" stopColor="#dbeafe" />
                         <stop offset="100%" stopColor="#eff6ff" />
                       </linearGradient>
-                      <linearGradient id="roadGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#64748b" />
-                        <stop offset="100%" stopColor="#94a3b8" />
-                      </linearGradient>
                     </defs>
                     <rect width="400" height="200" fill="url(#skyGrad)" />
-                    {/* Sun */}
                     <circle cx="340" cy="40" r="25" fill="#fbbf24" opacity="0.8" />
-                    {/* Clouds */}
                     <ellipse cx="80" cy="35" rx="30" ry="12" fill="white" opacity="0.7" />
                     <ellipse cx="100" cy="30" rx="25" ry="10" fill="white" opacity="0.7" />
                     <ellipse cx="250" cy="50" rx="20" ry="8" fill="white" opacity="0.5" />
-                    {/* Buildings */}
+                    {/* Simplified buildings for performance/size */}
                     <rect x="20" y="80" width="50" height="90" rx="4" fill="#3b82f6" />
-                    <rect x="28" y="90" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="42" y="90" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="28" y="108" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="42" y="108" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="28" y="126" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="42" y="126" width="10" height="10" rx="1" fill="#93c5fd" />
-                    
                     <rect x="80" y="100" width="40" height="70" rx="4" fill="#6366f1" />
-                    <rect x="88" y="110" width="8" height="8" rx="1" fill="#a5b4fc" />
-                    <rect x="100" y="110" width="8" height="8" rx="1" fill="#a5b4fc" />
-                    <rect x="88" y="125" width="8" height="8" rx="1" fill="#a5b4fc" />
-                    <rect x="100" y="125" width="8" height="8" rx="1" fill="#a5b4fc" />
-                    
                     <rect x="130" y="70" width="60" height="100" rx="4" fill="#2563eb" />
-                    <rect x="140" y="80" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="155" y="80" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="170" y="80" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="140" y="98" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="155" y="98" width="10" height="10" rx="1" fill="#bfdbfe" />
-                    <rect x="170" y="98" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="140" y="116" width="10" height="10" rx="1" fill="#bfdbfe" />
-                    <rect x="155" y="116" width="10" height="10" rx="1" fill="#93c5fd" />
-                    <rect x="170" y="116" width="10" height="10" rx="1" fill="#93c5fd" />
-                    
                     <rect x="200" y="90" width="45" height="80" rx="4" fill="#4f46e5" />
                     <rect x="260" y="110" width="35" height="60" rx="4" fill="#7c3aed" />
                     <rect x="310" y="95" width="55" height="75" rx="4" fill="#3b82f6" />
@@ -221,17 +194,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                     <rect x="300" y="183" width="30" height="3" rx="1" fill="#fbbf24" />
                     <rect x="350" y="183" width="30" height="3" rx="1" fill="#fbbf24" />
                     
-                    {/* Trees */}
-                    <rect x="242" y="140" width="6" height="30" fill="#92400e" />
-                    <circle cx="245" cy="130" r="15" fill="#22c55e" />
-                    <circle cx="245" cy="122" r="10" fill="#16a34a" />
-                    
-                    {/* Street Light */}
-                    <rect x="295" y="130" width="4" height="40" fill="#78716c" />
-                    <rect x="289" y="128" width="16" height="4" rx="2" fill="#78716c" />
-                    <circle cx="297" cy="126" r="4" fill="#fbbf24" opacity="0.6" />
-                    
-                    {/* Checkmark badge */}
                     <circle cx="355" cy="130" r="16" fill="#22c55e" />
                     <path d="M347 130 L353 136 L363 124" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -240,12 +202,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                 <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                   <div className="flex -space-x-2">
                     {['bg-blue-500', 'bg-emerald-500', 'bg-purple-500', 'bg-amber-500'].map((color, i) => (
-                      <div key={i} className={`w-8 h-8 rounded-full border-2 border-white ${color} flex items-center justify-center text-white text-xs font-bold`}>
+                      <div key={i} className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-2 border-white ${color} flex items-center justify-center text-white text-[10px] md:text-xs font-bold`}>
                         {['S', 'A', 'M', 'R'][i]}
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs font-bold text-slate-500">+42 citizens upvoted</p>
+                  <p className="text-[10px] md:text-xs font-bold text-slate-500">+42 {t('citizens upvoted')}</p>
                 </div>
               </motion.div>
 
@@ -253,22 +215,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               <FloatingCard
                 delay={1}
                 position="top-left"
-                icon={<MapPin size={18} />}
-                label="Real-time Tracking"
+                icon={<MapPin size={16} className="md:w-[18px] md:h-[18px]" />}
+                label={t('Real-time Tracking')}
                 color="blue"
               />
               <FloatingCard
                 delay={2}
                 position="bottom-right"
-                icon={<BarChart3 size={18} />}
-                label="Analytics Dashboard"
+                icon={<BarChart3 size={16} className="md:w-[18px] md:h-[18px]" />}
+                label={t('Analytics Dashboard')}
                 color="purple"
               />
               <FloatingCard
                 delay={3}
                 position="bottom-left"
-                icon={<Zap size={18} />}
-                label="Instant Alerts"
+                icon={<Zap size={16} className="md:w-[18px] md:h-[18px]" />}
+                label={t('Instant Alerts')}
                 color="amber"
               />
             </motion.div>
@@ -276,101 +238,101 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </div>
 
         {/* Features Section */}
-        <section id="features" className="py-24 px-8 bg-white">
+        <section id="features" className="py-16 md:py-24 px-6 md:px-8 bg-white">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
+            <div className="text-center mb-12 md:mb-16">
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="inline-block px-4 py-2 bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest rounded-full mb-4"
+                className="inline-block px-3 py-1.5 md:px-4 md:py-2 bg-blue-50 text-blue-600 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-full mb-4"
               >
-                How it Works
+                {t('How it Works')}
               </motion.span>
               <motion.h2 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-5xl font-black tracking-tight mb-4"
+                className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-4"
               >
-                Simple, Fast, Effective
+                {t('Simple, Fast, Effective')}
               </motion.h2>
               <motion.p 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-slate-600 font-medium max-w-2xl mx-auto text-lg"
+                className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto"
               >
-                Three simple steps to make your voice heard and your city better.
+                {t('Three simple steps to make your voice heard and your city better.')}
               </motion.p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
               <FeatureCard 
                 step="01"
-                icon={<MapPin size={32} />}
-                title="Report"
-                description="Spot a civic issue? Snap a photo, add details, tag the location, and submit your report in under a minute."
+                icon={<MapPin size={28} className="md:w-8 md:h-8" />}
+                title={t('Report')}
+                description={t('Spot a civic issue? Snap a photo, add details, tag the location, and submit your report in under a minute.')}
               />
               <FeatureCard 
                 step="02"
-                icon={<Shield size={32} />}
-                title="Track"
-                description="Authorities verify your report and assign it to the relevant department. Track real-time updates."
+                icon={<Shield size={28} className="md:w-8 md:h-8" />}
+                title={t('Track')}
+                description={t('Authorities verify your report and assign it to the relevant department. Track real-time updates.')}
               />
               <FeatureCard 
                 step="03"
-                icon={<CheckCircle2 size={32} />}
-                title="Resolve"
-                description="Get notifications at every step until the issue is fully resolved. Transparency guaranteed."
+                icon={<CheckCircle2 size={28} className="md:w-8 md:h-8" />}
+                title={t('Resolve')}
+                description={t('Get notifications at every step until the issue is fully resolved. Transparency guaranteed.')}
               />
             </div>
           </div>
         </section>
 
         {/* Benefits Section */}
-        <section className="py-24 px-8 bg-slate-50">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <section className="py-16 md:py-24 px-6 md:px-8 bg-slate-50">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
-              <span className="inline-block px-4 py-2 bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest rounded-full mb-6">
-                Why Choose NagrikSetu
+              <span className="inline-block px-3 py-1.5 md:px-4 md:py-2 bg-blue-50 text-blue-600 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-full mb-4 md:mb-6">
+                {t('Why Choose NagrikSetu')}
               </span>
-              <h2 className="text-5xl font-black tracking-tight mb-6">
-                Built for the Community
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-4 md:mb-6">
+                {t('Built for the Community')}
               </h2>
-              <p className="text-lg text-slate-600 font-medium mb-8">
-                Our platform leverages the power of community engagement to drive real change in your neighborhood.
+              <p className="text-base md:text-lg text-slate-600 font-medium mb-6 md:mb-8">
+                {t('Our platform leverages the power of community engagement to drive real change in your neighborhood.')}
               </p>
-              <div className="space-y-4">
-                <BenefitItem icon={<TrendingUp />} label="Prioritization based on community upvotes" />
-                <BenefitItem icon={<Lock />} label="Secure and privacy-focused" />
-                <BenefitItem icon={<Award />} label="Transparent resolution tracking" />
-                <BenefitItem icon={<Clock />} label="24/7 reporting and monitoring" />
+              <div className="space-y-3 md:space-y-4">
+                <BenefitItem icon={<TrendingUp size={18} className="md:w-5 md:h-5" />} label={t('Prioritization based on community upvotes')} />
+                <BenefitItem icon={<Lock size={18} className="md:w-5 md:h-5" />} label={t('Secure and privacy-focused')} />
+                <BenefitItem icon={<Award size={18} className="md:w-5 md:h-5" />} label={t('Transparent resolution tracking')} />
+                <BenefitItem icon={<Clock size={18} className="md:w-5 md:h-5" />} label={t('24/7 reporting and monitoring')} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-4 md:gap-6">
               <BenefitCard
-                icon={<Users size={24} />}
+                icon={<Users size={20} className="md:w-6 md:h-6" />}
                 value="10,000+"
-                label="Supported Citizens"
+                label={t('Supported Citizens')}
                 color="blue"
               />
               <BenefitCard
-                icon={<CheckCircle2 size={24} />}
-                value="Many"
-                label="Issues to get Resolved"
+                icon={<CheckCircle2 size={20} className="md:w-6 md:h-6" />}
+                value={t('Many')}
+                label={t('Issues to get Resolved')}
                 color="emerald"
               />
               <BenefitCard
-                icon={<BarChart3 size={24} />}
+                icon={<BarChart3 size={20} className="md:w-6 md:h-6" />}
                 value="94%"
-                label="Satisfaction Rate"
+                label={t('Satisfaction Rate')}
                 color="purple"
               />
               <BenefitCard
-                icon={<Zap size={24} />}
-                value="3 Days"
-                label="Avg Resolution"
+                icon={<Zap size={20} className="md:w-6 md:h-6" />}
+                value={t('3 Days')}
+                label={t('Avg Resolution')}
                 color="amber"
               />
             </div>
@@ -378,44 +340,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 px-8 bg-gradient-to-br from-blue-600 to-indigo-600">
+        <section className="py-16 md:py-24 px-6 md:px-8 bg-gradient-to-br from-blue-600 to-indigo-600">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight">
-                Ready to Make a Difference?
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 tracking-tight">
+                {t('Ready to Make a Difference?')}
               </h2>
-              <p className="text-xl text-blue-100 font-medium mb-10 max-w-2xl mx-auto">
-                Join thousands of active citizens working together to build better, safer, and cleaner communities.
+              <p className="text-base md:text-xl text-blue-100 font-medium mb-8 md:mb-10 max-w-2xl mx-auto">
+                {t('Join thousands of active citizens working together to build better, safer, and cleaner communities.')}
               </p>
               <button 
                 onClick={() => openAuth('signup')}
-                className="inline-flex items-center gap-3 px-10 py-5 bg-white text-blue-600 rounded-2xl font-black text-lg hover:shadow-2xl transition-all active:scale-95 group"
+                className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-10 md:py-5 bg-white text-blue-600 rounded-2xl font-black text-base md:text-lg hover:shadow-2xl transition-all active:scale-95 group"
               >
-                Start Reporting Issues
-                <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                {t('Start Reporting Issues')}
+                <ArrowRight size={20} className="md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
               </button>
             </motion.div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="bg-slate-900 text-white py-12 px-8">
+        <footer className="bg-slate-900 text-white py-10 md:py-12 px-6 md:px-8">
           <div className="max-w-7xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                <Shield size={24} />
+            <div className="flex items-center justify-center gap-2 md:gap-3 mb-4">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                <Shield size={20} className="md:w-6 md:h-6" />
               </div>
-              <span className="font-black text-2xl">NagrikSetu</span>
+              <span className="font-black text-xl md:text-2xl">NagrikSetu</span>
             </div>
-            <p className="text-slate-400 font-medium mb-6">
-              Bridging citizens and authorities for a better tomorrow.
+            <p className="text-sm md:text-base text-slate-400 font-medium mb-6">
+              {t('Bridging citizens and authorities for a better tomorrow.')}
             </p>
-            <p className="text-sm text-slate-500">
-              © 2026 NagrikSetu. All rights reserved.
+            <p className="text-xs md:text-sm text-slate-500">
+              {t('© 2026 NagrikSetu. All rights reserved.')}
             </p>
           </div>
         </footer>
@@ -435,11 +397,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 function StatItem({ label, value, icon }: { label: string, value: string, icon: React.ReactNode }) {
   return (
     <div>
-      <div className="flex items-center gap-2 text-blue-600 mb-2">
+      <div className="flex items-center gap-1 md:gap-2 text-blue-600 mb-1 md:mb-2">
         {icon}
       </div>
-      <p className="text-3xl font-black text-slate-900 mb-1">{value}</p>
-      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{label}</p>
+      <p className="text-2xl md:text-3xl font-black text-slate-900 mb-1">{value}</p>
+      <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">{label}</p>
     </div>
   );
 }
@@ -455,16 +417,16 @@ function FeatureCard({ step, icon, title, description }: {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="relative p-8 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all group"
+      className="relative p-6 md:p-8 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all group"
     >
-      <div className="absolute top-6 right-6 text-6xl font-black text-slate-50 group-hover:text-blue-50 transition-colors">
+      <div className="absolute top-4 right-4 md:top-6 md:right-6 text-4xl md:text-6xl font-black text-slate-50 group-hover:text-blue-50 transition-colors">
         {step}
       </div>
-      <div className="w-16 h-16 bg-slate-50 text-slate-900 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+      <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-50 text-slate-900 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all relative z-10">
         {icon}
       </div>
-      <h3 className="text-2xl font-black mb-3">{title}</h3>
-      <p className="text-slate-600 font-medium leading-relaxed">{description}</p>
+      <h3 className="text-xl md:text-2xl font-black mb-2 md:mb-3 relative z-10">{title}</h3>
+      <p className="text-sm md:text-base text-slate-600 font-medium leading-relaxed relative z-10">{description}</p>
     </motion.div>
   );
 }
@@ -483,9 +445,9 @@ function FloatingCard({
   color: 'blue' | 'purple' | 'amber' 
 }) {
   const positions = {
-    'top-left': '-top-8 -left-8',
-    'bottom-right': '-bottom-8 -right-8',
-    'bottom-left': '-bottom-12 -left-12'
+    'top-left': '-top-6 -left-4 md:-top-8 md:-left-8',
+    'bottom-right': '-bottom-6 -right-4 md:-bottom-8 md:-right-8',
+    'bottom-left': '-bottom-10 -left-6 md:-bottom-12 md:-left-12'
   };
 
   const colors = {
@@ -499,23 +461,23 @@ function FloatingCard({
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay, type: "spring" }}
-      className={`absolute ${positions[position as keyof typeof positions]} bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 flex items-center gap-3`}
+      className={`absolute ${positions[position as keyof typeof positions]} bg-white p-2 md:p-4 rounded-xl md:rounded-2xl shadow-xl flex items-center gap-2 md:gap-3 border border-slate-100`}
     >
-      <div className={`w-10 h-10 ${colors[color]} rounded-xl flex items-center justify-center`}>
+      <div className={`w-8 h-8 md:w-10 md:h-10 ${colors[color]} rounded-lg md:rounded-xl flex items-center justify-center`}>
         {icon}
       </div>
-      <p className="text-sm font-bold whitespace-nowrap">{label}</p>
+      <p className="text-[10px] md:text-sm font-bold whitespace-nowrap">{label}</p>
     </motion.div>
   );
 }
 
 function BenefitItem({ icon, label }: { icon: React.ReactNode, label: string }) {
   return (
-    <div className="flex items-center gap-3 text-slate-700">
-      <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+    <div className="flex items-center gap-2 md:gap-3 text-slate-700">
+      <div className="w-5 h-5 md:w-6 md:h-6 bg-blue-100 text-blue-600 rounded-md md:rounded-lg flex items-center justify-center shrink-0">
         {icon}
       </div>
-      <p className="font-medium">{label}</p>
+      <p className="text-sm md:text-base font-medium">{label}</p>
     </div>
   );
 }
@@ -541,11 +503,11 @@ function BenefitCard({
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className={`p-6 bg-gradient-to-br ${colors[color]} rounded-3xl shadow-lg text-white`}
+      className={`p-4 md:p-6 bg-gradient-to-br ${colors[color]} rounded-2xl md:rounded-3xl shadow-lg text-white`}
     >
-      <div className="mb-4">{icon}</div>
-      <p className="text-4xl font-black mb-2">{value}</p>
-      <p className="text-sm font-bold opacity-90">{label}</p>
+      <div className="mb-2 md:mb-4">{icon}</div>
+      <p className="text-2xl md:text-4xl font-black mb-1 md:mb-2">{value}</p>
+      <p className="text-[10px] md:text-sm font-bold opacity-90 leading-tight">{label}</p>
     </motion.div>
   );
 }

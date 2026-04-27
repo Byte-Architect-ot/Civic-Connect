@@ -15,15 +15,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + '-' + file.originalname.replace(/\s+/g, '_');
-    cb(null, uniqueName);
-  }
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
@@ -48,8 +40,12 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
 
     const { title, description, category, priority, location, lat, lng } = req.body;
 
-    // If a file was uploaded, store its server path; otherwise empty string
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+    // If a file was uploaded, store its base64 string; otherwise empty string
+    let imageUrl = '';
+    if (req.file) {
+      const base64Str = req.file.buffer.toString('base64');
+      imageUrl = `data:${req.file.mimetype};base64,${base64Str}`;
+    }
 
     const newHazard = new Hazard({
       title,

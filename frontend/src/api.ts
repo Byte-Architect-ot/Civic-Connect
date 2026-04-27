@@ -178,8 +178,8 @@ export async function apiDeleteHazard(id: string) {
 /** Resolve an imageUrl to its full display URL (handles both server paths and external URLs) */
 export function resolveImageUrl(imageUrl?: string): string | undefined {
   if (!imageUrl) return undefined;
-  // Already a full URL (old data or external)
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+  // Already a full URL or data URI
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://') || imageUrl.startsWith('data:')) {
     return imageUrl;
   }
   // Server-relative path like /uploads/filename.jpg

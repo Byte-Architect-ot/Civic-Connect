@@ -54,7 +54,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, currentUserId, onCl
     >
       {/* Image Section */}
       {hasImage && (
-        <div className="relative h-48 overflow-hidden bg-slate-100">
+        <div className="relative h-40 md:h-48 overflow-hidden bg-slate-100">
           <img 
             src={resolvedImageUrl} 
             alt={issue.title} 
@@ -69,7 +69,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, currentUserId, onCl
         </div>
       )}
 
-      <div className="p-5 space-y-4">
+      <div className="p-4 md:p-5 space-y-3 md:space-y-4">
         {/* Header */}
         <div className="flex justify-between items-start gap-3">
           <div className="flex-1 min-w-0">

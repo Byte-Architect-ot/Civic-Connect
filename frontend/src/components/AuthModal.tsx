@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Shield, User as UserIcon, Lock, Mail, Phone, Key, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { apiRegister, apiLogin } from '../api';
+import { useTranslation } from 'react-i18next';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onLogin }) => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
   const [role, setRole] = useState<'Citizen' | 'Staff'>('Citizen');
   const [formData, setFormData] = useState({
@@ -52,19 +54,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
     return Object.keys(newErrors).length === 0;
   };
 
-  // Map frontend role to backend role
   const mapRoleToBackend = (r: 'Citizen' | 'Staff'): 'user' | 'admin' => {
     return r === 'Staff' ? 'admin' : 'user';
   };
 
-  // Map backend role to frontend role
   const mapRoleToFrontend = (r: string): UserRole => {
     return r === 'admin' ? 'Staff' : 'Citizen';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -72,7 +71,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
 
     try {
       let backendUser: any;
-
       if (mode === 'signup') {
         backendUser = await apiRegister({
           name: formData.name,
@@ -86,7 +84,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         backendUser = await apiLogin(formData.email, formData.password);
       }
 
-      // Transform to frontend User type
       const frontendUser: User = {
         id: backendUser.id || backendUser._id,
         name: backendUser.name,
@@ -125,8 +122,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <motion.div
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -135,10 +131,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
       />
       
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden"
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 100 }}
+        className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden mt-auto sm:mt-0 max-h-[90vh] overflow-y-auto"
       >
         <button 
           onClick={handleClose}
@@ -149,22 +145,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         </button>
 
         <div className="p-8">
-          {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-100 mx-auto mb-4">
               <Shield size={32} />
             </div>
             <h2 className="text-3xl font-black tracking-tight text-slate-900">
-              {mode === 'signin' ? 'Welcome Back' : 'Create Account'}
+              {mode === 'signin' ? t('Welcome Back') : t('Create Account')}
             </h2>
             <p className="text-slate-500 font-medium text-sm mt-2">
               {mode === 'signin' 
-                ? 'Sign in to access your NagrikSetu account' 
-                : 'Join the community and make a difference'}
+                ? t('Sign in to access your NagrikSetu account')
+                : t('Join the community and make a difference')}
             </p>
           </div>
 
-          {/* Role Selection */}
           <div className="flex p-1.5 bg-slate-100 rounded-2xl mb-8">
             <button
               type="button"
@@ -177,7 +171,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               }`}
             >
               <UserIcon size={16} />
-              Citizen
+              {t('Citizen')}
             </button>
             <button
               type="button"
@@ -190,24 +184,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               }`}
             >
               <Shield size={16} />
-              Authority
+              {t('Authority')}
             </button>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name Field (Signup Only) */}
             {mode === 'signup' && (
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
-                  Full Name <span className="text-rose-500">*</span>
+                  {t('Full Name')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input
                     type="text"
                     required
-                    placeholder="Enter your full name"
+                    placeholder={t('Enter your full name')}
                     disabled={isLoading}
                     className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                       errors.name ? 'border-rose-300 bg-rose-50' : 'border-transparent'
@@ -225,17 +217,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               </div>
             )}
 
-            {/* Email Field */}
             <div className="space-y-2">
               <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
-                Email Address <span className="text-rose-500">*</span>
+                {t('Email Address')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                   type="email"
                   required
-                  placeholder="name@example.com"
+                  placeholder={t('name@example.com')}
                   disabled={isLoading}
                   className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                     errors.email ? 'border-rose-300 bg-rose-50' : 'border-transparent'
@@ -252,17 +243,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               )}
             </div>
 
-            {/* Password Field */}
             <div className="space-y-2">
               <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
-                Password <span className="text-rose-500">*</span>
+                {t('Password')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                   type="password"
                   required
-                  placeholder="Enter your password"
+                  placeholder={t('Enter your password')}
                   disabled={isLoading}
                   className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                     errors.password ? 'border-rose-300 bg-rose-50' : 'border-transparent'
@@ -279,17 +269,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               )}
             </div>
 
-            {/* Phone Field (Signup Only) */}
             {mode === 'signup' && (
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
-                  Phone Number
+                  {t('Phone Number')}
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input
                     type="tel"
-                    placeholder="+91 98765 43210"
+                    placeholder={t('+91 98765 43210')}
                     disabled={isLoading}
                     className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                       errors.phone ? 'border-rose-300 bg-rose-50' : 'border-transparent'
@@ -307,18 +296,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               </div>
             )}
 
-            {/* Admin Key (Staff Only) */}
             {role === 'Staff' && (
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
-                  Admin Key <span className="text-rose-500">*</span>
+                  {t('Admin Key')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input
                     type="password"
                     required
-                    placeholder="Enter admin key"
+                    placeholder={t('Enter admin key')}
                     disabled={isLoading}
                     className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                       errors.referralKey ? 'border-rose-300 bg-rose-50' : 'border-transparent'
@@ -334,13 +322,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                   </p>
                 ) : (
                   <p className="text-xs text-slate-500 font-medium ml-1">
-                    Admin key: <code className="px-2 py-0.5 bg-slate-100 rounded font-mono">CIVIC_ADMIN_2026</code>
+                    {t('Authority admin key:')} <code className="px-2 py-0.5 bg-slate-100 rounded font-mono">CIVIC_ADMIN_2026</code>
                   </p>
                 )}
               </div>
             )}
 
-            {/* General Error */}
             {errors.general && (
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
@@ -352,7 +339,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               </motion.div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -361,18 +347,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               {isLoading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Processing...
+                  {t('Processing...')}
                 </>
               ) : (
                 <>
                   <CheckCircle2 size={18} />
-                  {mode === 'signin' ? 'Sign In' : 'Create Account'}
+                  {mode === 'signin' ? t('Sign In') : t('Create Account')}
                 </>
               )}
             </button>
           </form>
 
-          {/* Switch Mode */}
           <div className="mt-8 text-center">
             <button
               onClick={switchMode}
@@ -380,18 +365,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               className="text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors disabled:opacity-50"
             >
               {mode === 'signin' 
-                ? "Don't have an account? Sign Up" 
-                : "Already have an account? Sign In"}
+                ? t("Don't have an account? Sign Up") 
+                : t("Already have an account? Sign In")}
             </button>
           </div>
 
-          {/* Info Box */}
           <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-2xl">
-            <p className="text-xs font-bold text-blue-900 mb-2">ℹ️ Info</p>
+            <p className="text-xs font-bold text-blue-900 mb-2">ℹ️ {t('Info')}</p>
             <div className="space-y-1 text-xs text-blue-700 font-medium">
-              <p>Register as <strong>Citizen</strong> to report issues</p>
-              <p>Register as <strong>Authority</strong> to manage issues</p>
-              <p>Authority admin key: <code className="px-1 py-0.5 bg-blue-100 rounded font-mono">CIVIC_ADMIN_2026</code></p>
+              <p>{t('Register as Citizen to report issues')}</p>
+              <p>{t('Register as Authority to manage issues')}</p>
+              <p>{t('Authority admin key:')} <code className="px-1 py-0.5 bg-blue-100 rounded font-mono">CIVIC_ADMIN_2026</code></p>
             </div>
           </div>
         </div>

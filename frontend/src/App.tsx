@@ -141,8 +141,21 @@ export default function App() {
   const [isReportFormOpen, setIsReportFormOpen] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState<CivicIssue | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const [filters, setFilters] = useState<FilterOptions>({
     category: 'All',
@@ -396,12 +409,12 @@ export default function App() {
           <div className="space-y-6">
             {/* Quick Filters */}
             <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar snap-x touch-pan-x w-full sm:w-auto">
                 {['All', 'Roads', 'Garbage', 'Water', 'Electricity', 'Public Health', 'Others'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setFilters(prev => ({ ...prev, category: cat as any }))}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
+                    className={`snap-start px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                       filters.category === cat 
                         ? 'bg-slate-900 text-white shadow-lg' 
                         : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
@@ -414,32 +427,31 @@ export default function App() {
               <div className="flex gap-2">
                 <button 
                   onClick={() => setIsFilterPanelOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-white border border-slate-200 rounded-xl text-xs md:text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
                 >
                   <SlidersHorizontal size={16} />
-                  Advanced Filters
+                  {t('Advanced Filters')}
                 </button>
                 {currentUser!.role === 'Staff' && (
                   <button 
                     onClick={exportData}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-white border border-slate-200 rounded-xl text-xs md:text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
                   >
                     <Download size={16} />
-                    Export
+                    {t('Export')}
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Loading State */}
             {isLoadingData ? (
-              <div className="bg-white border border-slate-200 rounded-3xl p-20 flex flex-col items-center justify-center text-center">
-                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Loading reports...</h3>
-                <p className="text-slate-500 font-medium">Fetching data from server</p>
+              <div className="bg-white border border-slate-200 rounded-3xl p-10 md:p-20 flex flex-col items-center justify-center text-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-1">{t('Loading reports...')}</h3>
+                <p className="text-xs md:text-sm text-slate-500 font-medium">{t('Fetching data from server')}</p>
               </div>
             ) : filteredIssues.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {filteredIssues.map(issue => (
                   <IssueCard 
                     key={issue.id} 
@@ -451,15 +463,15 @@ export default function App() {
                 ))}
               </div>
             ) : (
-              <div className="bg-white border border-dashed border-slate-200 rounded-3xl p-20 flex flex-col items-center justify-center text-center">
-                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
-                  <Search size={40} />
+              <div className="bg-white border border-dashed border-slate-200 rounded-3xl p-10 md:p-20 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+                  <Search size={32} className="md:w-10 md:h-10" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">No issues found</h3>
-                <p className="text-slate-500 max-w-xs font-medium">
+                <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-1">{t('No issues found')}</h3>
+                <p className="text-xs md:text-sm text-slate-500 max-w-xs font-medium">
                   {currentView === 'MyReports' 
-                    ? "You haven't reported any issues yet. Click 'Report Issue' to get started!"
-                    : "We couldn't find any issues matching your filters. Try adjusting your search criteria."}
+                    ? t("You haven't reported any issues yet. Click 'Report Issue' to get started!")
+                    : t("We couldn't find any issues matching your filters. Try adjusting your search criteria.")}
                 </p>
                 <button
                   onClick={() => {
@@ -472,9 +484,9 @@ export default function App() {
                       sortBy: 'date'
                     });
                   }}
-                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
+                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"
                 >
-                  Clear Filters
+                  {t('Clear Filters')}
                 </button>
               </div>
             )}
@@ -504,11 +516,17 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
       {/* Sidebar */}
       <motion.aside
         initial={false}
         animate={{ width: isSidebarOpen ? 280 : 80 }}
-        className="bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen z-40 overflow-hidden"
+        className={`bg-white border-r border-slate-200 flex flex-col fixed md:sticky top-0 h-screen z-50 overflow-hidden transition-transform duration-300 md:transition-none ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         <div className="p-6 flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-100">
@@ -608,35 +626,45 @@ export default function App() {
         </div>
 
         {/* Header */}
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 flex-1 max-w-2xl">
+        <header className="h-16 md:h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-4 flex-1 max-w-2xl">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500"
+              className="p-1.5 md:p-2 hover:bg-slate-100 rounded-lg md:rounded-xl transition-colors text-slate-500"
             >
               {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
               <input
                 type="text"
-                placeholder="Search issues, locations, keywords..."
-                className="w-full pl-12 pr-4 py-2.5 rounded-2xl bg-slate-100 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 outline-none transition-all text-sm font-medium"
+                placeholder={t('Search issues, locations, keywords...')}
+                className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-2 md:py-2.5 rounded-xl md:rounded-2xl bg-slate-100 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 outline-none transition-all text-xs md:text-sm font-medium"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-4 ml-8">
-            <LanguageSelector />
+          <div className="flex items-center gap-2 md:gap-4 ml-4 md:ml-8">
+            <div className="hidden sm:block">
+              <LanguageSelector />
+            </div>
             {currentUser.role === 'Citizen' && currentView !== 'Settings' && currentView !== 'Analytics' && (
               <button
                 onClick={() => setIsReportFormOpen(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95"
+                className="hidden sm:flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95"
               >
                 <Plus size={20} />
                 {t('Report Issue')}
+              </button>
+            )}
+            {currentUser.role === 'Citizen' && currentView !== 'Settings' && currentView !== 'Analytics' && (
+              <button
+                onClick={() => setIsReportFormOpen(true)}
+                className="sm:hidden w-8 h-8 md:w-10 md:h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95"
+              >
+                <Plus size={16} />
               </button>
             )}
             <div 
@@ -662,7 +690,7 @@ export default function App() {
         </header>
 
         {/* Content Area */}
-        <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
+        <div className="p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto w-full pb-20 md:pb-8">
           {/* Welcome & Stats */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
