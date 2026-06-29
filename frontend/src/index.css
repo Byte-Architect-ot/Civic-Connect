@@ -1,11 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @layer base {
   body {
-    @apply antialiased;
+    @apply antialiased text-slate-800 bg-slate-50;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
   }
 }
 
+/* Hide scrollbar but keep functionality */
 @utility no-scrollbar {
   &::-webkit-scrollbar {
     display: none;
@@ -14,20 +28,19 @@
   scrollbar-width: none;
 }
 
-/* Custom scrollbar for better UX */
+/* Custom minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 10px;
+  border-radius: 24px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -39,7 +52,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Loading animation */
+/* Loading shimmer effect */
 @keyframes shimmer {
   0% {
     background-position: -1000px 0;
@@ -51,20 +64,49 @@ html {
 
 .shimmer {
   animation: shimmer 2s infinite;
-  background: linear-gradient(to right, #f1f5f9 4%, #e2e8f0 25%, #f1f5f9 36%);
+  background: linear-gradient(to right, #f8fafc 4%, #f1f5f9 25%, #f8fafc 36%);
   background-size: 1000px 100%;
 }
 
-/* Hide Google Translate UI */
+/* Pulse animation */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hide Google Translate elements */
 .goog-te-banner-frame.skiptranslate, 
 #goog-gt-tt, 
 .goog-te-balloon-frame,
 .skiptranslate > iframe.goog-te-banner-frame { 
   display: none !important; 
 } 
+
 body {
   top: 0px !important; 
 }
+
 #google_translate_element {
   display: none !important;
+}
+
+/* Focus ring improvements */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* Selection styling */
+::selection {
+  background-color: #dbeafe;
+  color: #1e40af;
 }

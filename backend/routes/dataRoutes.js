@@ -6,7 +6,7 @@ const Hazard = require('../models/Hazard');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// ─── Multer Configuration ──────────────────
+// Multer Configuration 
 const fs = require('fs');
 const uploadDir = path.join(__dirname, '..', 'uploads');
 
@@ -32,6 +32,8 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
+const mlService = require('../services/mlService');
+
 // Create a new hazard report (with optional image upload)
 router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   try {
@@ -47,25 +49,73 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       imageUrl = `data:${req.file.mimetype};base64,${base64Str}`;
     }
 
+    // 🤖 ML ENHANCEMENT 1: Auto-categorize and detect severity
+    let mlAnalysis = null;
+    if (title && description) {
+      mlAnalysis = await mlService.analyzeIssue(title, description);
+    }
+
+    // 🤖 ML ENHANCEMENT 2: Check for duplicates
+    const existingIssues = await Hazard.find({
+      status: { $in: ['Pending', 'In Progress'] },
+      lat: { $exists: true, $ne: 0 },
+      lng: { $exists: true, $ne: 0 }
+    }).select('_id title lat lng').lean();
+
+    let duplicateCheck = { hasDuplicates: false, duplicates: [] };
+    if (lat && lng && existingIssues.length > 0) {
+      duplicateCheck = await mlService.checkDuplicates(
+        parseFloat(lat), 
+        parseFloat(lng), 
+        existingIssues.map(issue => ({
+          id: issue._id.toString(),
+          lat: issue.lat,
+          lng: issue.lng,
+          title: issue.title
+        }))
+      );
+    }
+
     const newHazard = new Hazard({
       title,
       description,
-      category: category || 'Others',
-      priority: priority || 'Medium',
+      category: mlAnalysis?.category || category || 'Others',
+      priority: mlAnalysis?.priority || priority || 'Medium',
       location: location || '',
       imageUrl,
-      lat: lat || (16.8 + Math.random() * 0.1),
-      lng: lng || (74.5 + Math.random() * 0.2),
+      lat: lat ? parseFloat(lat) : (16.8 + Math.random() * 0.1),
+      lng: lng ? parseFloat(lng) : (74.5 + Math.random() * 0.2),
       status: 'Pending',
       reportedBy: user.name,
       reportedByUserId: user._id,
       upvotes: 0,
       upvotedBy: [],
-      updates: []
+      updates: [],
+      // ML fields
+      mlCategory: mlAnalysis?.category || '',
+      mlPriority: mlAnalysis?.priority || '',
+      mlConfidence: mlAnalysis?.category_confidence || 0,
+      clusterSize: duplicateCheck.count || 0,
+      duplicateOf: duplicateCheck.duplicates ? duplicateCheck.duplicates.map(d => d.id) : []
     });
 
+    // 🤖 ML ENHANCEMENT 3: Calculate initial urgency score
+    const urgencyData = await mlService.calculateUrgency(newHazard);
+    if (urgencyData) {
+      newHazard.urgencyScore = urgencyData.urgency_score;
+    }
+
     const savedHazard = await newHazard.save();
-    res.status(201).json(savedHazard.toJSON());
+    
+    // Send response with hazard and ML metadata
+    res.status(201).json({
+      ...savedHazard.toJSON(),
+      mlSuggestions: mlAnalysis,
+      duplicateWarning: duplicateCheck.hasDuplicates ? {
+        message: `Found ${duplicateCheck.count} similar issue(s) nearby`,
+        duplicates: duplicateCheck.duplicates
+      } : null
+    });
   } catch (error) {
     // Handle multer-specific errors
     if (error instanceof multer.MulterError) {

@@ -35,10 +35,19 @@ const hazardSchema = new mongoose.Schema({
   upvotedBy: [{ type: String }],
   updates: [updateSchema],
   assignedTo: { type: String, default: '' },
-  expectedResolutionDate: { type: String, default: '' }
+  expectedResolutionDate: { type: String, default: '' },
+  
+  // NEW ML-ENHANCED FIELDS
+  mlCategory: { type: String, default: '' },  // AI-suggested category
+  mlPriority: { type: String, default: '' },  // AI-suggested priority
+  mlConfidence: { type: Number, default: 0 }, // Confidence score
+  urgencyScore: { type: Number, default: 0 }, // Dynamic urgency (0-100)
+  clusterSize: { type: Number, default: 0 },  // Number of similar reports
+  clusterId: { type: String, default: '' },   // Cluster identifier
+  duplicateOf: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hazard' }],  // Related issues
+  
 }, { timestamps: true });
 
-// Virtual to map _id to id for frontend compatibility
 hazardSchema.set('toJSON', {
   virtuals: true,
   transform: function(doc, ret) {

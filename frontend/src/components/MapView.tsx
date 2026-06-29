@@ -1,12 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, Info, Layers, Search as SearchIcon, Navigation, Maximize, X, Camera, ExternalLink, Image as ImageIcon, Map as MapIcon } from 'lucide-react';
+import { 
+  MapPin, Info, Layers, Search as SearchIcon, Navigation, 
+  Maximize, X, Camera, ExternalLink, Image as ImageIcon, 
+  Map as MapIcon 
+} from 'lucide-react';
 import { CivicIssue, IssueStatus, IssueCategory } from '../types';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, CircleMarker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icon in leaflet
+/* Fix default Leaflet marker icons */
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -14,8 +18,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Replace this with your actual Mapillary Client Token from mapillary.com/dashboard/developers
-const MAPILLARY_TOKEN = 'MLY|26292047430478386|9654cbe92bc0bddb3ca622559b4f7fea'; // Placeholder, replace with actual token
+const MAPILLARY_TOKEN = import.meta.env.VITE_MAPILLARY_TOKEN;
 
 interface MapViewProps {
   issues: CivicIssue[];
@@ -29,15 +32,17 @@ const statusColors: Record<IssueStatus, string> = {
   'Rejected': 'bg-rose-500',
 };
 
+/* Create custom colored markers based on status */
 const createCustomIcon = (status: IssueStatus) => {
-  let hexColor = '#3b82f6';
-  if (status === 'Pending') hexColor = '#f59e0b';
-  else if (status === 'In Progress') hexColor = '#3b82f6';
-  else if (status === 'Resolved') hexColor = '#10b981';
-  else if (status === 'Rejected') hexColor = '#f43f5e';
+  const colorMap = {
+    'Pending': '#f59e0b',
+    'In Progress': '#3b82f6',
+    'Resolved': '#10b981',
+    'Rejected': '#f43f5e',
+  };
 
   const markerHtml = `
-    <div style="background-color: ${hexColor}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"></div>
+    <div style="background-color: ${colorMap[status]}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"></div>
   `;
 
   return L.divIcon({
@@ -49,7 +54,7 @@ const createCustomIcon = (status: IssueStatus) => {
   });
 };
 
-// Map Control Helper Components
+/* Map control components */
 const MapController = ({ center, zoom }: { center: [number, number], zoom: number }) => {
   const map = useMap();
   useEffect(() => {
@@ -69,26 +74,42 @@ const ClickHandler = ({ onClick }: { onClick: (e: L.LeafletMouseEvent) => void }
 
 const ZoomControl = () => {
   const map = useMap();
+  
   return (
     <div className="absolute right-6 top-6 flex flex-col gap-2 z-[1000]">
-      <button onClick={() => map.zoomIn()} className="w-10 h-10 bg-slate-900/90 backdrop-blur text-white rounded-xl shadow-lg flex items-center justify-center hover:bg-blue-600 transition font-bold text-xl">+</button>
-      <button onClick={() => map.zoomOut()} className="w-10 h-10 bg-slate-900/90 backdrop-blur text-white rounded-xl shadow-lg flex items-center justify-center hover:bg-blue-600 transition font-bold text-xl">−</button>
-      <button onClick={() => {
-        if (!document.fullscreenElement) {
-          map.getContainer().requestFullscreen().catch(err => {
-            console.error(`Error attempting to enable fullscreen: ${err.message}`);
-          });
-        } else {
-          document.exitFullscreen();
-        }
-      }} className="w-10 h-10 bg-slate-900/90 backdrop-blur text-white rounded-xl shadow-lg flex items-center justify-center hover:bg-blue-600 transition mt-2">
+      <button 
+        onClick={() => map.zoomIn()} 
+        className="w-10 h-10 bg-slate-900/90 backdrop-blur text-white rounded-2xl shadow-soft-lg flex items-center justify-center hover:bg-slate-800 transition font-bold text-xl"
+      >
+        +
+      </button>
+      <button 
+        onClick={() => map.zoomOut()} 
+        className="w-10 h-10 bg-slate-900/90 backdrop-blur text-white rounded-2xl shadow-soft-lg flex items-center justify-center hover:bg-slate-800 transition font-bold text-xl"
+      >
+        −
+      </button>
+      <button 
+        onClick={() => {
+          if (!document.fullscreenElement) {
+            map.getContainer().requestFullscreen();
+          } else {
+            document.exitFullscreen();
+          }
+        }} 
+        className="w-10 h-10 bg-slate-900/90 backdrop-blur text-white rounded-2xl shadow-soft-lg flex items-center justify-center hover:bg-slate-800 transition mt-2"
+      >
         <Maximize size={18} />
       </button>
-      <button onClick={() => {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          map.flyTo([pos.coords.latitude, pos.coords.longitude], 15);
-        }, () => alert("Location access denied"));
-      }} className="w-10 h-10 bg-blue-600 backdrop-blur text-white rounded-xl shadow-lg flex items-center justify-center hover:bg-blue-700 transition mt-2">
+      <button 
+        onClick={() => {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => map.flyTo([pos.coords.latitude, pos.coords.longitude], 15),
+            () => alert("Location access denied")
+          );
+        }} 
+        className="w-10 h-10 bg-slate-900/90 backdrop-blur text-white rounded-2xl shadow-soft-lg flex items-center justify-center hover:bg-slate-800 transition"
+      >
         <Navigation size={18} />
       </button>
     </div>
@@ -99,19 +120,18 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
   const [selectedCategory, setSelectedCategory] = useState<IssueCategory | 'All'>('All');
   const [activeTab, setActiveTab] = useState<'issues' | 'street'>('issues');
   
-  // Search state
+  /* Search state */
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([28.6139, 77.2090]); // Default: New Delhi
+  const [mapCenter, setMapCenter] = useState<[number, number]>([28.6139, 77.2090]);
   const [mapZoom, setMapZoom] = useState(5);
 
-  // Mapillary state
+  /* Street view state */
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [mapillaryPoints, setMapillaryPoints] = useState<any[]>([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
 
-  // Auto center based on issues if available (only on initial load)
+  /* Auto-center map on issues */
   useEffect(() => {
     if (issues.length > 0 && mapCenter[0] === 28.6139) {
       const lats = issues.map(i => i.lat);
@@ -127,113 +147,92 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
     ? issues 
     : issues.filter(i => i.category === selectedCategory);
 
-  // Search logic (Nominatim API)
+  /* Location search with Nominatim */
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.length < 3) {
       setSearchResults([]);
       return;
     }
+    
     const timer = setTimeout(async () => {
-      setIsSearching(true);
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`);
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`
+        );
         const data = await res.json();
         setSearchResults(data);
       } catch (err) {
         console.error('Geocoding error:', err);
-      } finally {
-        setIsSearching(false);
       }
     }, 500);
+    
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const handleSelectLocation = (loc: any) => {
     setMapCenter([parseFloat(loc.lat), parseFloat(loc.lon)]);
-    // Zoom differently based on location type
-    let zoom = 12;
-    if (loc.type === 'city') zoom = 12;
-    else if (loc.type === 'administrative') zoom = 10;
-    else if (loc.type === 'village' || loc.type === 'neighbourhood') zoom = 15;
-    else zoom = 14;
-    setMapZoom(zoom);
+    setMapZoom(loc.type === 'city' ? 12 : 14);
     setSearchQuery('');
     setSearchResults([]);
   };
 
-  // Mapillary click logic
+  /* Handle map click for street view */
   const handleMapClick = async (e: L.LeafletMouseEvent) => {
     if (activeTab !== 'street') return;
     
     setIsLoadingImages(true);
     try {
-      // Calculate a bounding box around the click (approx 400m x 400m)
       const offset = 0.002;
-      const minLon = e.latlng.lng - offset;
-      const maxLon = e.latlng.lng + offset;
-      const minLat = e.latlng.lat - offset;
-      const maxLat = e.latlng.lat + offset;
-
-      // Fetch nearest images using Mapillary Graph API within bbox
       const res = await fetch(
-        `https://graph.mapillary.com/images?bbox=${minLon},${minLat},${maxLon},${maxLat}&fields=id,geometry,captured_at,compass_angle&limit=20`,
-        {
-          headers: {
-            'Authorization': `OAuth ${MAPILLARY_TOKEN}`
-          }
-        }
+        `https://graph.mapillary.com/images?bbox=${e.latlng.lng - offset},${e.latlng.lat - offset},${e.latlng.lng + offset},${e.latlng.lat + offset}&fields=id,geometry,captured_at,compass_angle&limit=20`,
+        { headers: { 'Authorization': `OAuth ${MAPILLARY_TOKEN}` } }
       );
       
-      if (!res.ok) {
-        throw new Error('Mapillary API returned an error');
-      }
+      if (!res.ok) throw new Error('Mapillary API error');
       
       const data = await res.json();
       if (data.data && data.data.length > 0) {
-        // Sort by distance to the clicked point
         const sorted = data.data.sort((a: any, b: any) => {
           const distA = Math.pow(a.geometry.coordinates[0] - e.latlng.lng, 2) + Math.pow(a.geometry.coordinates[1] - e.latlng.lat, 2);
           const distB = Math.pow(b.geometry.coordinates[0] - e.latlng.lng, 2) + Math.pow(b.geometry.coordinates[1] - e.latlng.lat, 2);
           return distA - distB;
         });
-
         setMapillaryPoints(sorted);
-        setSelectedImage(sorted[0]); // Select nearest
+        setSelectedImage(sorted[0]);
       } else {
-        alert("No street view images found at this location. Try clicking closer to a road.");
+        alert("No street view images found. Try clicking closer to a road.");
       }
     } catch (err) {
       console.error('Mapillary error:', err);
-      alert("Failed to load street view. Please verify the Mapillary Access Token in MapView.tsx.");
+      alert("Failed to load street view.");
     } finally {
       setIsLoadingImages(false);
     }
   };
 
   return (
-    <div className="h-[calc(100vh-240px)] bg-slate-900 rounded-3xl relative overflow-hidden border border-slate-700 shadow-2xl z-0 flex flex-col md:flex-row">
-      
-      {/* Map Area */}
+    <div className="h-[calc(100vh-240px)] bg-slate-900 rounded-4xl relative overflow-hidden border-2 border-slate-700 shadow-soft-xl z-0 flex flex-col md:flex-row">
+      {/* Map Container */}
       <div className="flex-1 relative z-0 h-full">
         <MapContainer 
           center={mapCenter} 
           zoom={mapZoom} 
           scrollWheelZoom={true} 
           className="w-full h-full z-0"
-          zoomControl={false} // We provide custom zoom controls
+          zoomControl={false}
         >
           <MapController center={mapCenter} zoom={mapZoom} />
           <ZoomControl />
           <ClickHandler onClick={handleMapClick} />
           
           <LayersControl position="bottomright">
-            <LayersControl.BaseLayer checked name="CartoDB Voyager (Light)">
+            <LayersControl.BaseLayer checked name="Light Map">
               <TileLayer
                 attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
                 url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
               />
             </LayersControl.BaseLayer>
-            <LayersControl.BaseLayer name="CartoDB Dark Matter">
+            <LayersControl.BaseLayer name="Dark Map">
               <TileLayer
                 attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -241,13 +240,13 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="Satellite">
               <TileLayer
-                attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                attribution='&copy; Esri'
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
               />
             </LayersControl.BaseLayer>
           </LayersControl>
 
-          {/* Issue Markers (Only shown on 'issues' tab) */}
+          {/* Issue markers */}
           {activeTab === 'issues' && filteredIssues.map((issue) => (
             <Marker 
               key={issue.id} 
@@ -255,59 +254,48 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
               icon={createCustomIcon(issue.status)}
               eventHandlers={{ click: () => onIssueClick(issue) }}
             >
-              <Popup className="rounded-xl overflow-hidden p-0 border-0" closeButton={false}>
-                  <div className="flex flex-col gap-2 min-w-[200px] p-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-black text-slate-900 line-clamp-2 flex-1 m-0">
-                        {issue.title}
-                      </p>
-                    </div>
-                    
-                    <div className="flex justify-between items-center w-full">
-                      <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${statusColors[issue.status]} text-white shrink-0`}>
-                          {issue.status}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                        issue.priority === 'Critical' ? 'bg-rose-100 text-rose-600' :
-                        issue.priority === 'High' ? 'bg-orange-100 text-orange-600' :
-                        issue.priority === 'Medium' ? 'bg-blue-100 text-blue-600' :
-                        'bg-slate-100 text-slate-600'
-                      }`}>
-                        {issue.priority}
-                      </span>
-                    </div>
-                    
-                    <p className="text-xs text-slate-500 flex items-center gap-1.5 m-0 mb-1">
-                      <MapPin size={12} /> {issue.location}
-                    </p>
-                    
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onIssueClick(issue);
-                      }} 
-                      className="w-full bg-blue-600 text-white rounded-lg py-2 px-3 text-xs font-bold hover:bg-blue-700 transition shadow-sm mt-1"
-                    >
-                      View Details
-                    </button>
+              <Popup className="rounded-2xl overflow-hidden" closeButton={false}>
+                <div className="flex flex-col gap-2 min-w-[200px] p-2">
+                  <p className="text-sm font-bold text-slate-900 line-clamp-2">
+                    {issue.title}
+                  </p>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${statusColors[issue.status]} text-white`}>
+                      {issue.status}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-600">
+                      {issue.priority}
+                    </span>
                   </div>
+                  
+                  <p className="text-xs text-slate-500 flex items-center gap-1">
+                    <MapPin size={12} /> {issue.location}
+                  </p>
+                  
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onIssueClick(issue);
+                    }} 
+                    className="w-full bg-slate-900 text-white rounded-xl py-2 text-xs font-semibold hover:bg-slate-800 transition"
+                  >
+                    View Details
+                  </button>
+                </div>
               </Popup>
             </Marker>
           ))}
 
-          {/* Mapillary Coverage Tiles & Points (Only shown on 'street' tab) */}
+          {/* Street view overlay */}
           {activeTab === 'street' && (
             <>
-              {/* Note: In a full prod app we would use Leaflet.VectorGrid for the PBF tiles.
-                  Since VectorGrid requires extra setup, we use the computed coverage raster layer fallback here, 
-                  or rely on user clicks to fetch points as implemented. */}
               <TileLayer 
                 url={`https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=${MAPILLARY_TOKEN}`}
                 opacity={0.6}
                 maxZoom={14}
               />
               
-              {/* Fetched Points on click */}
               {mapillaryPoints.map(pt => (
                 <CircleMarker
                   key={pt.id}
@@ -319,63 +307,66 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
                     fillOpacity: 1,
                     weight: 2
                   }}
-                  eventHandlers={{
-                    click: () => setSelectedImage(pt)
-                  }}
+                  eventHandlers={{ click: () => setSelectedImage(pt) }}
                 />
               ))}
             </>
           )}
         </MapContainer>
 
-        {/* Top Overlay UI */}
+        {/* UI Overlay */}
         <div className="absolute top-4 left-4 right-20 z-[1000] flex flex-col gap-4 pointer-events-none">
-          
-          {/* Top Bar (Tabs & Search) */}
+          {/* Tabs and Search */}
           <div className="flex flex-col md:flex-row gap-4 pointer-events-auto">
-            {/* Tabs */}
-            <div className="bg-slate-900/90 backdrop-blur-md p-1 rounded-2xl flex border border-slate-700 shadow-xl shrink-0">
+            <div className="bg-slate-900/90 backdrop-blur-xl p-1 rounded-2xl flex border border-slate-700">
               <button 
                 onClick={() => { setActiveTab('issues'); setSelectedImage(null); }}
-                className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'issues' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all ${
+                  activeTab === 'issues' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-white'
+                }`}
               >
                 <MapIcon size={16} /> Issues
               </button>
               <button 
                 onClick={() => setActiveTab('street')}
-                className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'street' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all ${
+                  activeTab === 'street' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
               >
                 <Camera size={16} /> Street View
               </button>
             </div>
 
-            {/* Search Bar */}
             <div className="relative w-full max-w-sm">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <SearchIcon size={18} className="text-slate-400" />
-              </div>
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input 
                 type="text" 
-                placeholder="Search district, city or place..." 
+                placeholder="Search location..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-900/90 backdrop-blur-md border border-slate-700 text-white rounded-2xl pl-12 pr-4 py-3 shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                className="w-full bg-slate-900/90 backdrop-blur-xl border border-slate-700 text-white rounded-2xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-600"
               />
-              {/* Search Results Dropdown */}
+              
               <AnimatePresence>
                 {searchResults.length > 0 && (
                   <motion.div 
-                    initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full mt-2 left-0 right-0 bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto"
+                    initial={{ opacity: 0, y: -10 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full mt-2 left-0 right-0 bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-soft-xl max-h-60 overflow-y-auto"
                   >
                     {searchResults.map((res: any, idx) => (
                       <button 
                         key={idx}
                         onClick={() => handleSelectLocation(res)}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700/50 last:border-0 flex flex-col transition-colors"
+                        className="w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700/50 last:border-0 transition-colors"
                       >
-                        <span className="text-sm font-bold text-white line-clamp-1">{res.display_name.split(',')[0]}</span>
-                        <span className="text-xs text-slate-400 line-clamp-1">{res.display_name}</span>
+                        <span className="text-sm font-semibold text-white line-clamp-1">
+                          {res.display_name.split(',')[0]}
+                        </span>
+                        <span className="text-xs text-slate-400 line-clamp-1">
+                          {res.display_name}
+                        </span>
                       </button>
                     ))}
                   </motion.div>
@@ -384,26 +375,26 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
             </div>
           </div>
 
-          {/* Filters (Only for issues) */}
+          {/* Category Filter */}
           <AnimatePresence>
             {activeTab === 'issues' && (
               <motion.div 
-                initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                className="bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-2xl p-4 max-w-[200px] pointer-events-auto shadow-xl"
+                initial={{ opacity: 0, x: -20 }} 
+                animate={{ opacity: 1, x: 0 }} 
+                exit={{ opacity: 0, x: -20 }}
+                className="bg-slate-900/90 backdrop-blur-xl border border-slate-700 rounded-2xl p-4 max-w-[200px] pointer-events-auto"
               >
                 <div className="flex items-center gap-2 mb-3">
-                  <Layers size={14} className="text-blue-400" />
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filter by Category</h4>
+                  <Layers size={14} className="text-slate-400" />
+                  <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wide">Category</h4>
                 </div>
                 <div className="space-y-1.5">
                   {['All', 'Roads', 'Garbage', 'Water', 'Electricity', 'Public Health', 'Others'].map(cat => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat as any)}
-                      className={`w-full px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-left ${
-                        selectedCategory === cat
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-300 hover:bg-slate-800'
+                      className={`w-full px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                        selectedCategory === cat ? 'bg-slate-900 text-white' : 'text-slate-300 hover:bg-slate-800'
                       }`}
                     >
                       {cat}
@@ -418,36 +409,39 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
           <AnimatePresence>
             {activeTab === 'street' && !selectedImage && (
               <motion.div 
-                initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                className="bg-emerald-900/90 backdrop-blur-md border border-emerald-700/50 rounded-2xl p-4 max-w-xs pointer-events-auto shadow-xl"
+                initial={{ opacity: 0, x: -20 }} 
+                animate={{ opacity: 1, x: 0 }} 
+                exit={{ opacity: 0, x: -20 }}
+                className="bg-emerald-900/90 backdrop-blur-xl border border-emerald-700 rounded-2xl p-4 max-w-xs pointer-events-auto"
               >
-                <h4 className="text-sm font-bold text-emerald-400 mb-1 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-emerald-300 mb-2 flex items-center gap-2">
                   <Camera size={16} /> Explore Streets
                 </h4>
-                <p className="text-xs text-emerald-100/70">
-                  Green tiles show areas with Mapillary coverage. <strong className="text-white">Click anywhere on the map</strong> to fetch and view the nearest street-level photos.
+                <p className="text-xs text-emerald-100">
+                  Click anywhere on the map to view street-level photos
                 </p>
                 {isLoadingImages && (
                   <div className="mt-3 flex items-center gap-2 text-xs text-emerald-300">
                     <div className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                    Loading nearest images...
+                    Loading images...
                   </div>
                 )}
               </motion.div>
             )}
           </AnimatePresence>
-
         </div>
 
-        {/* Legend (Issues Tab) */}
+        {/* Legend */}
         <AnimatePresence>
           {activeTab === 'issues' && (
             <motion.div 
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-              className="absolute bottom-6 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-4 rounded-2xl space-y-3 z-[1000] shadow-xl pointer-events-auto"
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: 20 }}
+              className="absolute bottom-6 left-4 bg-slate-900/90 backdrop-blur-xl border border-slate-700 p-4 rounded-2xl space-y-3 z-[1000] pointer-events-auto"
             >
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Info size={14} /> Status
+              <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wide flex items-center gap-2">
+                <Info size={14} /> Legend
               </h4>
               <LegendItem color="bg-amber-500" label="Pending" count={issues.filter(i => i.status === 'Pending').length} />
               <LegendItem color="bg-blue-500" label="In Progress" count={issues.filter(i => i.status === 'In Progress').length} />
@@ -456,10 +450,9 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
             </motion.div>
           )}
         </AnimatePresence>
-        
       </div>
 
-      {/* Mapillary Street Photo Viewer Panel */}
+      {/* Street View Panel */}
       <AnimatePresence>
         {activeTab === 'street' && selectedImage && (
           <motion.div 
@@ -469,7 +462,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
             className="h-full bg-slate-900 border-l border-slate-700 flex flex-col overflow-hidden shrink-0 z-10"
           >
             <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-slate-800">
-              <h3 className="font-bold text-white flex items-center gap-2">
+              <h3 className="font-semibold text-white flex items-center gap-2">
                 <ImageIcon size={18} className="text-emerald-400" />
                 Street View
               </h3>
@@ -481,8 +474,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
               </button>
             </div>
             
-            <div className="flex-1 w-full bg-black relative">
-              {/* Mapillary iFrame Embed */}
+            <div className="flex-1 w-full bg-black">
               <iframe
                 title="Mapillary View"
                 src={`https://www.mapillary.com/embed?image_key=${selectedImage.id}&style=split`}
@@ -490,31 +482,21 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
                 height="100%"
                 frameBorder="0"
                 allowFullScreen
-                className="w-full h-full"
               ></iframe>
             </div>
             
             <div className="p-4 bg-slate-800 border-t border-slate-700 space-y-3">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400">Captured on</span>
-                <span className="font-medium text-white">
-                  {new Date(selectedImage.captured_at).toLocaleDateString(undefined, { 
-                    year: 'numeric', month: 'short', day: 'numeric' 
-                  })}
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400">Captured</span>
+                <span className="text-white">
+                  {new Date(selectedImage.captured_at).toLocaleDateString()}
                 </span>
-              </div>
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400">Heading</span>
-                <span className="font-medium text-white">{Math.round(selectedImage.compass_angle)}°</span>
-              </div>
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400">Image ID</span>
-                <span className="font-mono text-slate-300">{selectedImage.id}</span>
               </div>
               <a 
                 href={`https://www.mapillary.com/app/?pKey=${selectedImage.id}`}
-                target="_blank" rel="noopener noreferrer"
-                className="mt-2 w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition"
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition"
               >
                 View on Mapillary <ExternalLink size={14} />
               </a>
@@ -525,39 +507,32 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
 
       <style>{`
         .leaflet-popup-content-wrapper {
-          border-radius: 0.75rem;
+          border-radius: 1rem;
           padding: 0;
-          box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
-        .leaflet-popup-content { margin: 12px; }
+        .leaflet-popup-content { margin: 0; }
         .leaflet-popup-tip-container { display: none; }
-        .leaflet-container { font-family: inherit; }
         .leaflet-control-layers { 
           border-radius: 1rem !important;
-          border: 1px solid #334155 !important;
+          border: 1px solid #475569 !important;
           background: rgba(15, 23, 42, 0.9) !important;
-          backdrop-filter: blur(8px);
+          backdrop-filter: blur(12px);
           color: white;
-          overflow: hidden;
-        }
-        .leaflet-control-layers-list { margin: 0 !important; padding: 8px !important; }
-        .leaflet-control-layers-toggle {
-          background-color: #1e293b !important;
-          border-radius: 1rem !important;
         }
       `}</style>
     </div>
   );
 };
 
+/* Legend item component */
 function LegendItem({ color, label, count }: { color: string, label: string, count: number }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <div className={`w-3 h-3 rounded-full ${color} shadow-md`} />
-        <span className="text-xs font-bold text-slate-300">{label}</span>
+        <div className={`w-3 h-3 rounded-full ${color}`} />
+        <span className="text-xs font-semibold text-slate-300">{label}</span>
       </div>
-      <span className="text-xs font-black text-white bg-slate-800 px-2 py-0.5 rounded-full min-w-[24px] text-center border border-slate-700">
+      <span className="text-xs font-bold text-white bg-slate-800 px-2 py-1 rounded-full min-w-[24px] text-center">
         {count}
       </span>
     </div>

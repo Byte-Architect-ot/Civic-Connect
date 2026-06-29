@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { X, Shield, User as UserIcon, Lock, Mail, Phone, Key, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { apiRegister, apiLogin } from '../api';
@@ -122,19 +122,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">      <motion.div
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={handleClose}
-        className="absolute inset-0 bg-slate-900/70 backdrop-blur-md"
+        className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"
       />
       
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 100 }}
-        className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden mt-auto sm:mt-0 max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-4xl shadow-soft-xl overflow-hidden mt-auto sm:mt-0 max-h-[90vh] overflow-y-auto"
       >
         <button 
           onClick={handleClose}
@@ -146,28 +147,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
 
         <div className="p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-100 mx-auto mb-4">
+            <div className="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center text-white shadow-soft-lg mx-auto mb-4">
               <Shield size={32} />
             </div>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900">
+            <h2 className="text-3xl font-display font-bold tracking-tight">
               {mode === 'signin' ? t('Welcome Back') : t('Create Account')}
             </h2>
-            <p className="text-slate-500 font-medium text-sm mt-2">
+            <p className="text-slate-500 text-sm mt-2">
               {mode === 'signin' 
-                ? t('Sign in to access your NagrikSetu account')
+                ? t('Sign in to access your account')
                 : t('Join the community and make a difference')}
             </p>
           </div>
 
-          <div className="flex p-1.5 bg-slate-100 rounded-2xl mb-8">
+          <div className="flex p-1.5 bg-slate-100 rounded-full mb-8">
             <button
               type="button"
               onClick={() => setRole('Citizen')}
               disabled={isLoading}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-sm font-semibold transition-all ${
                 role === 'Citizen' 
-                  ? 'bg-white text-blue-600 shadow-md' 
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-white text-slate-900 shadow-soft' 
+                  : 'text-slate-500'
               }`}
             >
               <UserIcon size={16} />
@@ -177,10 +178,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               type="button"
               onClick={() => setRole('Staff')}
               disabled={isLoading}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-sm font-semibold transition-all ${
                 role === 'Staff' 
-                  ? 'bg-white text-blue-600 shadow-md' 
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-white text-slate-900 shadow-soft' 
+                  : 'text-slate-500'
               }`}
             >
               <Shield size={16} />
@@ -191,7 +192,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
                   {t('Full Name')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -203,13 +204,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                     disabled={isLoading}
                     className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                       errors.name ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                    } focus:border-blue-500 focus:bg-white rounded-2xl outline-none transition-all font-medium text-sm`}
+                    } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 {errors.name && (
-                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1 ml-1">
+                  <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
                     <AlertCircle size={12} />
                     {errors.name}
                   </p>
@@ -218,7 +219,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
                 {t('Email Address')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
@@ -230,13 +231,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                   disabled={isLoading}
                   className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                     errors.email ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                  } focus:border-blue-500 focus:bg-white rounded-2xl outline-none transition-all font-medium text-sm`}
+                  } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
               {errors.email && (
-                <p className="text-rose-600 text-xs font-medium flex items-center gap-1 ml-1">
+                <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
                   <AlertCircle size={12} />
                   {errors.email}
                 </p>
@@ -244,7 +245,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
                 {t('Password')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
@@ -256,13 +257,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                   disabled={isLoading}
                   className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                     errors.password ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                  } focus:border-blue-500 focus:bg-white rounded-2xl outline-none transition-all font-medium text-sm`}
+                  } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
                   value={formData.password}
                   onChange={e => setFormData({ ...formData, password: e.target.value })}
                 />
               </div>
               {errors.password && (
-                <p className="text-rose-600 text-xs font-medium flex items-center gap-1 ml-1">
+                <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
                   <AlertCircle size={12} />
                   {errors.password}
                 </p>
@@ -271,7 +272,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
 
             {mode === 'signup' && (
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
                   {t('Phone Number')}
                 </label>
                 <div className="relative">
@@ -282,13 +283,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                     disabled={isLoading}
                     className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                       errors.phone ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                    } focus:border-blue-500 focus:bg-white rounded-2xl outline-none transition-all font-medium text-sm`}
+                    } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
                     value={formData.phone}
                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
                   />
                 </div>
                 {errors.phone && (
-                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1 ml-1">
+                  <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
                     <AlertCircle size={12} />
                     {errors.phone}
                   </p>
@@ -298,7 +299,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
 
             {role === 'Staff' && (
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
                   {t('Admin Key')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -310,18 +311,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                     disabled={isLoading}
                     className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
                       errors.referralKey ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                    } focus:border-blue-500 focus:bg-white rounded-2xl outline-none transition-all font-medium text-sm`}
+                    } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
                     value={formData.referralKey}
                     onChange={e => setFormData({ ...formData, referralKey: e.target.value })}
                   />
                 </div>
                 {errors.referralKey ? (
-                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1 ml-1">
+                  <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
                     <AlertCircle size={12} />
                     {errors.referralKey}
                   </p>
                 ) : (
-                  <p className="text-xs text-slate-500 font-medium ml-1">
+                  <p className="text-xs text-slate-500 ml-1">
                     {t('Authority admin key:')} <code className="px-2 py-0.5 bg-slate-100 rounded font-mono">CIVIC_ADMIN_2026</code>
                   </p>
                 )}
@@ -332,7 +333,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-rose-50 border-2 border-rose-200 rounded-xl text-rose-700 text-sm font-medium flex items-start gap-3"
+                className="p-4 bg-rose-50 border-2 border-rose-200 rounded-2xl text-rose-700 text-sm flex items-start gap-3"
               >
                 <AlertCircle size={18} className="shrink-0 mt-0.5" />
                 {errors.general}
@@ -342,7 +343,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold text-sm hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              className="w-full py-4 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
             >
               {isLoading ? (
                 <>
@@ -362,7 +363,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             <button
               onClick={switchMode}
               disabled={isLoading}
-              className="text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors disabled:opacity-50"
+              className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-50"
             >
               {mode === 'signin' 
                 ? t("Don't have an account? Sign Up") 
@@ -370,12 +371,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             </button>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-2xl">
-            <p className="text-xs font-bold text-blue-900 mb-2">ℹ️ {t('Info')}</p>
-            <div className="space-y-1 text-xs text-blue-700 font-medium">
+          <div className="mt-6 p-4 bg-slate-100 rounded-2xl">
+            <p className="text-xs font-semibold text-slate-700 mb-2">Info</p>
+            <div className="space-y-1 text-xs text-slate-600">
               <p>{t('Register as Citizen to report issues')}</p>
               <p>{t('Register as Authority to manage issues')}</p>
-              <p>{t('Authority admin key:')} <code className="px-1 py-0.5 bg-blue-100 rounded font-mono">CIVIC_ADMIN_2026</code></p>
+              <p>{t('Authority admin key:')} <code className="px-1 py-0.5 bg-white rounded font-mono">CIVIC_ADMIN_2026</code></p>
             </div>
           </div>
         </div>

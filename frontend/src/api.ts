@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 export const API_BASE = import.meta.env.PROD ? 'https://idt-lab.onrender.com' : '';
 
 const API_PATH = import.meta.env.PROD ? 'https://idt-lab.onrender.com/api' : '/api';
@@ -186,3 +187,77 @@ export function resolveImageUrl(imageUrl?: string): string | undefined {
   return `${API_BASE}${imageUrl}`;
 }
 
+
+// Add this function to your existing api.ts
+
+export const exportToExcel = async (): Promise<void> => {
+  const token = getToken();
+  if (!token) throw new Error('No authentication token');
+
+  try {
+    const response = await fetch(`${API_BASE}/api/export/excel`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Export failed: ${response.status} ${text}`);
+    }
+
+    /* Create download */
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `NagrikSetu_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error('Export error:', error);
+    throw error;
+  }
+};
+
+export const exportFilteredToExcel = async (filters: {
+  category?: string;
+  status?: string;
+  priority?: string;
+  dateRange?: string;
+} = {}): Promise<void> => {
+  const token = getToken();
+  if (!token) throw new Error('No authentication token');
+
+  try {
+    const response = await fetch(`${API_BASE}/api/export/excel/filtered`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(filters)
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Filtered export failed: ${response.status} ${text}`);
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `NagrikSetu_Filtered_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error('Filtered export error:', error);
+    throw error;
+  }
+};

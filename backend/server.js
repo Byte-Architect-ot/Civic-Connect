@@ -7,6 +7,7 @@ const { i18n, middleware } = require('./i18n');
 
 const authRoutes = require('./routes/authRoutes');
 const dataRoutes = require('./routes/dataRoutes');
+const exportRoutes = require('./routes/exportRoutes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.use('/api/auth', authRoutes);
 app.use('/api/data', dataRoutes);
+app.use('/api/export', exportRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

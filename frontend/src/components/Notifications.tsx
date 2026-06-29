@@ -31,24 +31,25 @@ export const Notifications: React.FC<NotificationsProps> = ({
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Header Actions */}
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-            <Bell size={24} className="text-blue-600" />
+          <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center">
+            <Bell size={24} className="text-slate-700" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-900">Notifications</h2>
-            <p className="text-slate-500 font-medium text-sm">
-              {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
+            <h2 className="text-2xl font-display font-bold">Notifications</h2>
+            <p className="text-slate-500 text-sm">
+              {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
             </p>
           </div>
         </div>
+        
         <div className="flex gap-2">
           {unreadCount > 0 && (
             <button 
               onClick={onMarkAllAsRead}
-              className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-xl text-sm font-bold transition-colors border border-blue-200"
+              className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-full text-sm font-semibold border-2 border-slate-200 transition-all"
             >
               <CheckCheck size={16} />
               Mark All Read
@@ -57,7 +58,7 @@ export const Notifications: React.FC<NotificationsProps> = ({
           {notifications.length > 0 && (
             <button 
               onClick={onClearAll}
-              className="flex items-center gap-2 px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-sm font-bold transition-colors border border-rose-200"
+              className="flex items-center gap-2 px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-full text-sm font-semibold border-2 border-rose-200 transition-all"
             >
               <Trash2 size={16} />
               Clear All
@@ -77,13 +78,13 @@ export const Notifications: React.FC<NotificationsProps> = ({
             />
           ))
         ) : (
-          <div className="bg-white border border-dashed border-slate-200 rounded-3xl p-20 flex flex-col items-center justify-center text-center">
-            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+          <div className="bg-white border-2 border-dashed border-slate-200 rounded-4xl p-20 flex flex-col items-center justify-center text-center">
+            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-4">
               <Bell size={48} />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">All Caught Up!</h3>
-            <p className="text-slate-500 max-w-sm font-medium">
-              No new notifications at the moment. We'll notify you when there are updates on your reports.
+            <h3 className="text-xl font-display font-bold mb-2">All Caught Up</h3>
+            <p className="text-slate-500 max-w-sm">
+              No new notifications. We'll notify you when there are updates
             </p>
           </div>
         )}
@@ -92,7 +93,8 @@ export const Notifications: React.FC<NotificationsProps> = ({
   );
 };
 
-function NotificationCard({ notification, onClick }: { notification: Notification, onClick: () => void, key?: string }) {
+/* Notification card component */
+function NotificationCard({ notification, onClick }: { notification: Notification, onClick: () => void }) {
   const getIcon = () => {
     switch (notification.type) {
       case 'StatusUpdate':
@@ -119,8 +121,6 @@ function NotificationCard({ notification, onClick }: { notification: Notificatio
         return 'bg-blue-50 text-blue-600 border-blue-100';
       case 'Upvote':
         return 'bg-purple-50 text-purple-600 border-purple-100';
-      case 'System':
-        return 'bg-slate-50 text-slate-600 border-slate-100';
       default:
         return 'bg-slate-50 text-slate-600 border-slate-100';
     }
@@ -132,46 +132,44 @@ function NotificationCard({ notification, onClick }: { notification: Notificatio
       animate={{ opacity: 1, x: 0 }}
       whileHover={{ scale: 1.01 }}
       onClick={onClick}
-      className={`p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+      className={`p-5 rounded-3xl border-2 transition-all cursor-pointer ${
         notification.isRead 
           ? 'bg-white border-slate-100 opacity-60 hover:opacity-80' 
-          : 'bg-white border-blue-200 shadow-md shadow-blue-100 hover:shadow-lg'
+          : 'bg-white border-slate-200 shadow-soft hover:shadow-soft-lg'
       }`}
     >
       <div className="flex gap-4">
-        {/* Icon */}
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${getColor()}`}>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${getColor()}`}>
           {getIcon()}
         </div>
         
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+            <h3 className="font-semibold text-slate-900 flex items-center gap-2">
               {notification.title}
               {!notification.isRead && (
-                <span className="w-2 h-2 bg-blue-600 rounded-full shrink-0"></span>
+                <span className="w-2 h-2 bg-slate-900 rounded-full shrink-0"></span>
               )}
             </h3>
             {notification.priority === 'High' && (
-              <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[10px] font-bold uppercase tracking-wider rounded-full shrink-0">
-                High Priority
+              <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-xs font-semibold rounded-full shrink-0">
+                High
               </span>
             )}
           </div>
           
-          <p className="text-slate-600 text-sm font-medium leading-relaxed mb-3">
+          <p className="text-slate-600 text-sm mb-3">
             {notification.message}
           </p>
           
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-xs text-slate-400">
               <Clock size={12} />
               {formatTimestamp(notification.timestamp)}
             </div>
             
             {notification.issueId && (
-              <span className="text-xs font-bold text-blue-600 hover:underline">
+              <span className="text-xs font-semibold text-slate-700 hover:text-slate-900">
                 View Issue →
               </span>
             )}
@@ -197,8 +195,6 @@ function formatTimestamp(timestamp: string): string {
   
   return date.toLocaleDateString('en-IN', { 
     day: 'numeric', 
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
+    month: 'short'
   });
 }

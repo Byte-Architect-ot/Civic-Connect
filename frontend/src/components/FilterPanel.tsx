@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Filter, SlidersHorizontal, Calendar, TrendingUp, Tag, CheckCircle2 } from 'lucide-react';
-import { FilterOptions, IssueCategory, IssueStatus, IssuePriority } from '../types';
+import { FilterOptions } from '../types';
 
 interface FilterPanelProps {
   isOpen: boolean;
@@ -37,17 +37,17 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-soft-xl z-50 overflow-y-auto"
           >
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <SlidersHorizontal size={20} className="text-blue-600" />
+                <div className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center">
+                  <SlidersHorizontal size={20} className="text-slate-700" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-900">Advanced Filters</h2>
-                  <p className="text-xs text-slate-500 font-medium">Refine your search results</p>
+                  <h2 className="text-xl font-display font-bold">Advanced Filters</h2>
+                  <p className="text-xs text-slate-500">Refine your search results</p>
                 </div>
               </div>
               <button 
@@ -70,10 +70,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                     <button
                       key={cat}
                       onClick={() => onFiltersChange({ ...filters, category: cat as any })}
-                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                      className={`px-4 py-3 rounded-full text-sm font-semibold transition-all ${
                         filters.category === cat
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-blue-300'
+                          ? 'bg-slate-900 text-white shadow-soft-lg'
+                          : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
                       }`}
                     >
                       {cat}
@@ -93,10 +93,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                     <button
                       key={status}
                       onClick={() => onFiltersChange({ ...filters, status: status as any })}
-                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                      className={`px-4 py-3 rounded-full text-sm font-semibold transition-all ${
                         filters.status === status
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-blue-300'
+                          ? 'bg-slate-900 text-white shadow-soft-lg'
+                          : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
                       }`}
                     >
                       {status}
@@ -116,10 +116,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                     <button
                       key={priority}
                       onClick={() => onFiltersChange({ ...filters, priority: priority as any })}
-                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                      className={`px-4 py-3 rounded-full text-sm font-semibold transition-all ${
                         filters.priority === priority
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-blue-300'
+                          ? 'bg-slate-900 text-white shadow-soft-lg'
+                          : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
                       }`}
                     >
                       {priority}
@@ -139,10 +139,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                     <button
                       key={range}
                       onClick={() => onFiltersChange({ ...filters, dateRange: range as any })}
-                      className={`w-full px-4 py-3 rounded-xl text-sm font-bold transition-all text-left ${
+                      className={`w-full px-4 py-3 rounded-full text-sm font-semibold transition-all text-left ${
                         filters.dateRange === range
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-blue-300'
+                          ? 'bg-slate-900 text-white shadow-soft-lg'
+                          : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
                       }`}
                     >
                       {range === 'All' ? 'All Time' : 
@@ -164,15 +164,16 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                   {[
                     { value: 'date', label: 'Most Recent' },
                     { value: 'upvotes', label: 'Most Upvoted' },
-                    { value: 'priority', label: 'Highest Priority' }
+                    { value: 'priority', label: 'Highest Priority' },
+                    { value: 'urgency', label: 'Urgency Score' }
                   ].map(sort => (
                     <button
                       key={sort.value}
                       onClick={() => onFiltersChange({ ...filters, sortBy: sort.value as any })}
-                      className={`w-full px-4 py-3 rounded-xl text-sm font-bold transition-all text-left ${
+                      className={`w-full px-4 py-3 rounded-full text-sm font-semibold transition-all text-left ${
                         filters.sortBy === sort.value
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-blue-300'
+                          ? 'bg-slate-900 text-white shadow-soft-lg'
+                          : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
                       }`}
                     >
                       {sort.label}
@@ -186,13 +187,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
             <div className="sticky bottom-0 bg-white border-t border-slate-200 p-6 space-y-3">
               <button
                 onClick={handleReset}
-                className="w-full px-6 py-3 rounded-xl font-bold text-slate-600 border-2 border-slate-200 hover:bg-slate-50 transition-colors"
+                className="w-full px-6 py-3 rounded-full font-semibold text-slate-600 border-2 border-slate-200 hover:bg-slate-50 transition-all"
               >
                 Reset All Filters
               </button>
               <button
                 onClick={onClose}
-                className="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95"
+                className="w-full px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all"
               >
                 Apply Filters
               </button>
@@ -204,6 +205,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
   );
 };
 
+/* Filter section component */
 function FilterSection({ 
   icon, 
   label, 
@@ -220,8 +222,8 @@ function FilterSection({
       <div className="flex items-center gap-2 mb-3">
         <div className="text-slate-500">{icon}</div>
         <div>
-          <h3 className="font-bold text-slate-900">{label}</h3>
-          <p className="text-xs text-slate-500 font-medium">{description}</p>
+          <h3 className="font-semibold text-slate-900">{label}</h3>
+          <p className="text-xs text-slate-500">{description}</p>
         </div>
       </div>
       {children}

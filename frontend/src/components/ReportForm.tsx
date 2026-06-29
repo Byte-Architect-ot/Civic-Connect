@@ -1,8 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Upload, MapPin, AlertTriangle, Camera, FileText, Tag, TrendingUp, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { X, Upload, MapPin, AlertTriangle, Camera, FileText, Tag, TrendingUp, Trash2, Loader2, Image as ImageIcon, Sparkles, AlertCircle } from 'lucide-react';
 import { IssueCategory, IssuePriority } from '../types';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+
+const ML_SERVICE_URL = import.meta.env.VITE_ML_SERVICE_URL || 'http://localhost:8000';
 
 interface ReportFormProps {
   isOpen: boolean;
@@ -12,8 +15,6 @@ interface ReportFormProps {
 
 const categories: IssueCategory[] = ['Roads', 'Garbage', 'Water', 'Electricity', 'Public Health', 'Others'];
 const priorities: IssuePriority[] = ['Low', 'Medium', 'High', 'Critical'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmit }) => {
   const { t } = useTranslation();
@@ -27,55 +28,65 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageError, setImageError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
+
+  // 🤖 ML STATE
+  const [mlSuggestions, setMlSuggestions] = useState<any>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisDebounce, setAnalysisDebounce] = useState<NodeJS.Timeout | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
-  // Cleanup camera stream on unmount or close
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
-
-  const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setIsCameraOpen(false);
-  }, []);
-
-  const validateFile = (file: File): string | null => {
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return 'Unsupported file format. Only JPEG, PNG, and WebP are allowed.';
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      return `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 5MB.`;
-    }
-    return null;
-  };
-
-  const handleFileSelect = (file: File) => {
-    const error = validateFile(file);
-    if (error) {
-      setImageError(error);
-      setImageFile(null);
-      setImagePreview(null);
+  // 🤖 REAL-TIME ML ANALYSIS
+  const analyzeText = async (title: string, description: string) => {
+    if (title.length < 10 || description.length < 20) {
+      setMlSuggestions(null);
       return;
     }
 
-    setImageError(null);
-    setImageFile(file);
+    setIsAnalyzing(true);
+    try {
+      const response = await axios.post(`${ML_SERVICE_URL}/api/ml/categorize/analyze`, {
+        title,
+        description
+      }, { timeout: 10000 });
 
-    // Create preview URL
+      setMlSuggestions(response.data);
+      
+      // Auto-apply ML suggestions
+      setFormData(prev => ({
+        ...prev,
+        category: response.data.category || prev.category,
+        priority: response.data.priority || prev.priority
+      }));
+    } catch (error) {
+      console.error('ML analysis failed:', error);
+      setMlSuggestions(null);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // Debounced analysis
+  useEffect(() => {
+    if (analysisDebounce) {
+      clearTimeout(analysisDebounce);
+    }
+
+    const timeout = setTimeout(() => {
+      analyzeText(formData.title, formData.description);
+    }, 1500); // Wait 1.5s after user stops typing
+
+    setAnalysisDebounce(timeout);
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [formData.title, formData.description]);
+
+  const handleFileSelect = (file: File) => {
+    setImageFile(file);
     const reader = new FileReader();
     reader.onload = (e) => {
       setImagePreview(e.target?.result as string);
@@ -88,102 +99,36 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
     if (file) {
       handleFileSelect(file);
     }
-    // Reset the input so re-selecting same file triggers change
     e.target.value = '';
   };
 
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview(null);
-    setImageError(null);
-    stopCamera();
-  };
-
-  // --- Desktop Camera (WebRTC) ---
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  const handleCameraClick = async () => {
-    if (isMobile) {
-      // On mobile, use native camera input
-      cameraInputRef.current?.click();
-      return;
-    }
-
-    // On desktop, open WebRTC camera
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-      streamRef.current = stream;
-      setIsCameraOpen(true);
-
-      // Wait for video element to be rendered
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play();
-        }
-      }, 100);
-    } catch (err: any) {
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        setImageError('Camera permission denied. Please use "Upload from Device" instead, or enable camera access in your browser settings.');
-      } else if (err.name === 'NotFoundError') {
-        setImageError('No camera detected on this device. Please use "Upload from Device" to attach a photo.');
-      } else {
-        setImageError('Could not access camera. Please use "Upload from Device" instead.');
-      }
-    }
-  };
-
-  const handleCapturePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.drawImage(video, 0, 0);
-
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], `camera-capture-${Date.now()}.jpg`, { type: 'image/jpeg' });
-        handleFileSelect(file);
-        stopCamera();
-      }
-    }, 'image/jpeg', 0.9);
   };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    
     if (formData.title.trim().length < 10) {
       newErrors.title = 'Title must be at least 10 characters long';
     }
-    
     if (formData.description.trim().length < 20) {
       newErrors.description = 'Description must be at least 20 characters long';
     }
-    
     if (formData.location.trim().length < 5) {
       newErrors.location = 'Please provide a specific location';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validate()) return;
     
     setIsSubmitting(true);
     try {
-      await onSubmit({ ...formData, imageFile });
+      await onSubmit({ ...formData, imageFile, mlSuggestions });
       // Reset form
       setFormData({ 
         title: '', 
@@ -194,7 +139,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
       });
       setImageFile(null);
       setImagePreview(null);
-      setImageError(null);
+      setMlSuggestions(null);
       setErrors({});
     } catch (err) {
       // Error handled by parent
@@ -213,9 +158,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
     });
     setImageFile(null);
     setImagePreview(null);
-    setImageError(null);
+    setMlSuggestions(null);
     setErrors({});
-    stopCamera();
     onClose();
   };
 
@@ -234,59 +178,123 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed left-0 bottom-0 sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 w-full sm:w-[95%] md:w-full max-w-2xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl z-50 overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-2xl bg-white rounded-3xl shadow-2xl z-50 overflow-hidden max-h-[90vh] flex flex-col"
           >
             {/* Header */}
-            <div className="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50">
               <div>
-                <h2 className="text-xl md:text-2xl font-black text-slate-900">{t('Report an Issue')}</h2>
-                <p className="text-xs md:text-sm text-slate-600 font-medium">{t('Help improve your community')}</p>
+                <h2 className="text-2xl font-black text-slate-900">{t('Report an Issue')}</h2>
+                <p className="text-sm text-slate-600 font-medium">{t('AI-powered issue reporting')}</p>
               </div>
               <button 
                 onClick={handleClose} 
                 className="p-2 hover:bg-white rounded-xl transition-colors text-slate-400 hover:text-slate-900"
-                aria-label="Close report form"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-5 overflow-y-auto flex-1">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
               {/* Issue Title */}
               <div>
-                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
+                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
                   <FileText size={16} />
                   {t('Issue Title')}
                   <span className="text-rose-500">*</span>
+                  {isAnalyzing && (
+                    <span className="flex items-center gap-1 text-blue-600 text-xs">
+                      <Loader2 size={12} className="animate-spin" />
+                      Analyzing...
+                    </span>
+                  )}
                 </label>
                 <input
                   required
                   type="text"
-                  placeholder={t('e.g., Large pothole on Main Street near traffic signal')}
-                  className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 ${
+                  placeholder={t('e.g., Large pothole on Main Street')}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${
                     errors.title ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
                   } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium text-sm`}
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
                 />
                 {errors.title && (
-                  <p className="text-rose-600 text-[10px] md:text-xs font-medium mt-1 flex items-center gap-1">
+                  <p className="text-rose-600 text-xs font-medium mt-1 flex items-center gap-1">
                     <AlertTriangle size={12} />
                     {errors.title}
                   </p>
                 )}
               </div>
 
+              {/* Description */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                  <FileText size={16} />
+                  {t('Detailed Description')}
+                  <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder={t("Describe the issue in detail...")}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${
+                    errors.description ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
+                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none font-medium text-sm`}
+                  value={formData.description}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                />
+                {errors.description && (
+                  <p className="text-rose-600 text-xs font-medium mt-1 flex items-center gap-1">
+                    <AlertTriangle size={12} />
+                    {errors.description}
+                  </p>
+                )}
+              </div>
+
+              {/* 🤖 ML SUGGESTIONS DISPLAY */}
+              {mlSuggestions && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles size={18} className="text-blue-600" />
+                    <h4 className="font-bold text-blue-900">AI Analysis Complete</h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-white rounded-xl p-3 border border-blue-100">
+                      <p className="text-xs text-blue-600 font-bold mb-1">Suggested Category</p>
+                      <p className="font-black text-slate-900">{mlSuggestions.category}</p>
+                      <p className="text-xs text-blue-500 mt-1">
+                        {Math.round(mlSuggestions.category_confidence * 100)}% confident
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-xl p-3 border border-blue-100">
+                      <p className="text-xs text-blue-600 font-bold mb-1">Suggested Priority</p>
+                      <p className="font-black text-slate-900">{mlSuggestions.priority}</p>
+                      <p className="text-xs text-blue-500 mt-1">
+                        {Math.round(mlSuggestions.priority_confidence * 100)}% confident
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-700 mt-3 flex items-center gap-1">
+                    <AlertCircle size={12} />
+                    Auto-applied. You can still change these values below.
+                  </p>
+                </motion.div>
+              )}
+
               {/* Category and Priority */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-slate-200/50 p-3 sm:border-none sm:p-0 rounded-2xl">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
                     <Tag size={16} />
                     {t('Category')}
                   </label>
                   <select
-                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium text-sm"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium text-sm"
                     value={formData.category}
                     onChange={e => setFormData({ ...formData, category: e.target.value as IssueCategory })}
                   >
@@ -297,12 +305,12 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
                 </div>
                 
                 <div>
-                  <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
                     <TrendingUp size={16} />
                     {t('Priority Level')}
                   </label>
                   <select
-                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium text-sm"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-medium text-sm"
                     value={formData.priority}
                     onChange={e => setFormData({ ...formData, priority: e.target.value as IssuePriority })}
                   >
@@ -315,7 +323,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
 
               {/* Location */}
               <div>
-                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
+                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
                   <MapPin size={16} />
                   {t('Location')}
                   <span className="text-rose-500">*</span>
@@ -324,227 +332,72 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
                   required
                   type="text"
                   placeholder={t('Specific area, landmark, or street name')}
-                  className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 ${
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${
                     errors.location ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
                   } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium text-sm`}
                   value={formData.location}
                   onChange={e => setFormData({ ...formData, location: e.target.value })}
                 />
-                {errors.location && (
-                  <p className="text-rose-600 text-[10px] md:text-xs font-medium mt-1 flex items-center gap-1">
-                    <AlertTriangle size={12} />
-                    {errors.location}
-                  </p>
-                )}
               </div>
 
-              {/* Description */}
+              {/* Image Upload (Simplified) */}
               <div>
-                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-1.5 md:mb-2">
-                  <FileText size={16} />
-                  {t('Detailed Description')}
-                  <span className="text-rose-500">*</span>
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  placeholder={t("Describe the issue in detail. Include information about how long it's been present, severity, and impact on the community...")}
-                  className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl border-2 ${
-                    errors.description ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none font-medium text-sm`}
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                />
-                <div className="flex justify-between items-center mt-1">
-                  {errors.description ? (
-                    <p className="text-rose-600 text-[10px] md:text-xs font-medium flex items-center gap-1">
-                      <AlertTriangle size={12} />
-                      {errors.description}
-                    </p>
-                  ) : (
-                    <p className="text-slate-400 text-[10px] md:text-xs font-medium">
-                      {formData.description.length} characters
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* ─── Image Upload Section ─── */}
-              <div className="bg-slate-50/50 p-3 md:p-4 rounded-2xl border border-slate-100">
-                <label className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3">
+                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
                   <ImageIcon size={16} />
                   {t('Attach Photo')}
-                  <span className="text-slate-400 font-normal text-[10px] md:text-xs">{t('(Optional)')}</span>
+                  <span className="text-slate-400 font-normal text-xs">(Optional)</span>
                 </label>
-
-                {/* Hidden file inputs */}
+                
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={handleFileInputChange}
-                  aria-label="Upload image from device"
-                />
-                <input
-                  ref={cameraInputRef}
-                  type="file"
                   accept="image/*"
-                  capture="environment"
                   className="hidden"
                   onChange={handleFileInputChange}
-                  aria-label="Capture photo from camera"
                 />
-                <canvas ref={canvasRef} className="hidden" />
 
-                {/* Camera Viewfinder (Desktop WebRTC) */}
-                <AnimatePresence>
-                  {isCameraOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="mb-3 md:mb-4 rounded-2xl overflow-hidden border-2 border-blue-300 bg-black"
-                    >
-                      <video
-                         ref={videoRef}
-                         autoPlay
-                         playsInline
-                         muted
-                         className="w-full h-48 md:h-64 object-cover"
-                      />
-                      <div className="flex gap-2 p-2 md:gap-3 md:p-3 bg-slate-900">
-                        <button
-                          type="button"
-                          onClick={handleCapturePhoto}
-                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 md:px-4 md:py-2.5 bg-blue-600 text-white rounded-xl text-sm md:text-base font-bold hover:bg-blue-700 transition-colors"
-                          aria-label="Capture photo"
-                        >
-                          <Camera size={18} />
-                          {t('Capture')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={stopCamera}
-                          className="px-3 py-2 md:px-4 md:py-2.5 bg-slate-700 text-white rounded-xl text-sm md:text-base font-bold hover:bg-slate-600 transition-colors"
-                          aria-label="Cancel camera"
-                        >
-                          {t('Cancel')}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Image Preview */}
-                {imagePreview && !isCameraOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mb-3 md:mb-4 relative group"
-                  >
-                    <div className="rounded-2xl overflow-hidden border-2 border-emerald-200 bg-slate-50">
-                      <img
-                        src={imagePreview}
-                        alt="Selected image preview"
-                        className="w-full h-40 md:h-48 object-cover"
-                      />
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-3 py-2 md:px-4 md:py-2.5 bg-emerald-50 border-t border-emerald-200">
-                        <div className="flex items-center gap-2 text-emerald-700 text-[10px] md:text-xs font-bold min-w-0 w-full sm:w-auto">
-                          <ImageIcon size={14} className="shrink-0" />
-                          <span className="truncate">{imageFile?.name}</span>
-                          <span className="text-emerald-500 shrink-0">
-                            ({(imageFile?.size ? imageFile.size / 1024 : 0).toFixed(0)} KB)
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleRemoveImage}
-                          className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-1.5 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold hover:bg-rose-200 transition-colors shrink-0"
-                          aria-label="Remove selected image"
-                        >
-                          <Trash2 size={12} />
-                          {t('Remove')}
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Upload & Camera Buttons */}
-                {!imagePreview && !isCameraOpen && (
-                  <div className="grid grid-cols-2 gap-2 md:gap-3 mb-2 md:mb-3">
+                {imagePreview ? (
+                  <div className="relative group">
+                    <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-xl border-2 border-emerald-200" />
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center justify-center gap-2 md:gap-2.5 px-2 md:px-4 py-3 md:py-4 border-2 border-dashed border-slate-300 rounded-2xl bg-white text-slate-600 font-bold hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all group shadow-sm"
-                      aria-label="Upload image from device"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 p-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600"
                     >
-                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:border-blue-200 transition-colors shrink-0">
-                        <Upload size={18} className="md:w-5 md:h-5" />
-                      </div>
-                      <div className="text-left hidden sm:block">
-                        <p className="text-xs md:text-sm font-bold">{t('Upload from Device')}</p>
-                        <p className="text-[9px] md:text-[10px] text-slate-400 font-medium">{t('Browse files')}</p>
-                      </div>
-                      <span className="sm:hidden text-xs font-bold leading-tight">{t('Upload')}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleCameraClick}
-                      className="flex items-center justify-center gap-2 md:gap-2.5 px-2 md:px-4 py-3 md:py-4 border-2 border-dashed border-slate-300 rounded-2xl bg-white text-slate-600 font-bold hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all group shadow-sm"
-                      aria-label="Take photo with camera"
-                    >
-                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 group-hover:border-indigo-200 transition-colors shrink-0">
-                        <Camera size={18} className="md:w-5 md:h-5" />
-                      </div>
-                      <div className="text-left hidden sm:block">
-                        <p className="text-xs md:text-sm font-bold">{t('Take Photo')}</p>
-                        <p className="text-[9px] md:text-[10px] text-slate-400 font-medium">{t('Use camera')}</p>
-                      </div>
-                      <span className="sm:hidden text-xs font-bold leading-tight">{t('Camera')}</span>
+                      <Trash2 size={16} />
                     </button>
                   </div>
-                )}
-
-                {/* Image Error */}
-                {imageError && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-2 p-2 md:p-3 bg-rose-50 border border-rose-200 rounded-xl mb-2 md:mb-3"
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full px-4 py-4 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 hover:border-blue-400 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 text-slate-600 hover:text-blue-600 font-bold"
                   >
-                    <AlertTriangle size={14} className="text-rose-500 shrink-0 mt-0.5 md:w-4 md:h-4" />
-                    <p className="text-rose-600 text-[10px] md:text-xs font-medium">{imageError}</p>
-                  </motion.div>
+                    <Upload size={18} />
+                    Click to upload image
+                  </button>
                 )}
-
-                {/* Format hint */}
-                <p className="text-[9px] md:text-[11px] text-slate-400 font-medium text-center sm:text-left">
-                  {t('Accepted formats: JPEG, PNG, WebP • Max size: 5MB')}
-                </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2 md:gap-3 pt-2 md:pt-4">
+              <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={handleClose}
                   disabled={isSubmitting}
-                  className="w-1/3 px-2 md:px-6 py-3 rounded-xl font-bold text-sm md:text-base text-slate-600 hover:bg-slate-100 transition-colors border-2 border-slate-200 disabled:opacity-50"
+                  className="w-1/3 px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-colors border-2 border-slate-200 disabled:opacity-50"
                 >
                   {t('Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-2/3 flex-1 px-4 md:px-6 py-3 rounded-xl font-bold text-sm md:text-base text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 size={16} className="animate-spin md:w-[18px] md:h-[18px]" />
-                      {t('Uploading...')}
+                      <Loader2 size={16} className="animate-spin" />
+                      {t('Submitting...')}
                     </>
                   ) : (
                     t('Submit Report')
