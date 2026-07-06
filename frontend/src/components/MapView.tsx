@@ -211,7 +211,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
   };
 
   return (
-    <div className="h-[calc(100vh-240px)] bg-slate-900 rounded-4xl relative overflow-hidden border-2 border-slate-700 shadow-soft-xl z-0 flex flex-col md:flex-row">
+    <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-240px)] bg-slate-900 rounded-4xl relative overflow-hidden border-2 border-slate-700 shadow-soft-xl z-0 flex flex-col md:flex-row">
       {/* Map Container */}
       <div className="flex-1 relative z-0 h-full">
         <MapContainer 
@@ -456,10 +456,10 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
       <AnimatePresence>
         {activeTab === 'street' && selectedImage && (
           <motion.div 
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 400, opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            className="h-full bg-slate-900 border-l border-slate-700 flex flex-col overflow-hidden shrink-0 z-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="w-full md:w-[400px] h-[40vh] md:h-full bg-slate-900 md:border-l border-t md:border-t-0 border-slate-700 flex flex-col overflow-hidden shrink-0 z-10"
           >
             <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-slate-800">
               <h3 className="font-semibold text-white flex items-center gap-2">

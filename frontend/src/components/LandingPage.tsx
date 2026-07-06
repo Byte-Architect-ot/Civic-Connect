@@ -89,7 +89,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             </div>
 
             {/* Simple stats */}
-            <div className="grid grid-cols-3 gap-8 pt-16 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-16 max-w-2xl mx-auto">
               <StatItem label={t('Active Users')} value="10k+" />
               <StatItem label={t('Issues Resolved')} value="5k+" />
               <StatItem label={t('Cities')} value="12+" />
@@ -170,7 +170,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <MetricCard value="10,000+" label={t('Active Citizens')} />
                 <MetricCard value="5,000+" label={t('Issues Resolved')} />
                 <MetricCard value="94%" label={t('Satisfaction Rate')} />
