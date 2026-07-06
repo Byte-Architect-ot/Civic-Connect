@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
-export const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '';
+export const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://idt-lab-1.onrender.com';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+const API_URL = import.meta.env.VITE_API_URL || 'https://idt-lab-1.onrender.com';
 const API_PATH = API_URL + (import.meta.env.VITE_API_PATH || '/api');
 
 function getToken(): string | null {
