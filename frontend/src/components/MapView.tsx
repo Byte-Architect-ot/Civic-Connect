@@ -13,9 +13,9 @@ import 'leaflet/dist/leaflet.css';
 /* Fix default Leaflet marker icons */
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl: import.meta.env.VITE_LEAFLET_MARKER_ICON_2X || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: import.meta.env.VITE_LEAFLET_MARKER_ICON || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: import.meta.env.VITE_LEAFLET_MARKER_SHADOW || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
 const MAPILLARY_TOKEN = import.meta.env.VITE_MAPILLARY_TOKEN;
@@ -157,7 +157,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`
+          `${import.meta.env.VITE_NOMINATIM_API_URL || 'https://nominatim.openstreetmap.org/search'}?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`
         );
         const data = await res.json();
         setSearchResults(data);
@@ -184,7 +184,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
     try {
       const offset = 0.002;
       const res = await fetch(
-        `https://graph.mapillary.com/images?bbox=${e.latlng.lng - offset},${e.latlng.lat - offset},${e.latlng.lng + offset},${e.latlng.lat + offset}&fields=id,geometry,captured_at,compass_angle&limit=20`,
+        `${import.meta.env.VITE_MAPILLARY_GRAPH_URL || 'https://graph.mapillary.com'}/images?bbox=${e.latlng.lng - offset},${e.latlng.lat - offset},${e.latlng.lng + offset},${e.latlng.lat + offset}&fields=id,geometry,captured_at,compass_angle&limit=20`,
         { headers: { 'Authorization': `OAuth ${MAPILLARY_TOKEN}` } }
       );
       
@@ -229,19 +229,19 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
             <LayersControl.BaseLayer checked name="Light Map">
               <TileLayer
                 attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
-                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                url={import.meta.env.VITE_CARTO_VOYAGER_URL || "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"}
               />
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="Dark Map">
               <TileLayer
                 attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                url={import.meta.env.VITE_CARTO_DARK_URL || "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"}
               />
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="Satellite">
               <TileLayer
                 attribution='&copy; Esri'
-                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                url={import.meta.env.VITE_ARCGIS_SATELLITE_URL || "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"}
               />
             </LayersControl.BaseLayer>
           </LayersControl>
@@ -291,7 +291,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
           {activeTab === 'street' && (
             <>
               <TileLayer 
-                url={`https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=${MAPILLARY_TOKEN}`}
+                url={`${import.meta.env.VITE_MAPILLARY_TILES_URL || 'https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2'}/{z}/{x}/{y}?access_token=${MAPILLARY_TOKEN}`}
                 opacity={0.6}
                 maxZoom={14}
               />
@@ -477,7 +477,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
             <div className="flex-1 w-full bg-black">
               <iframe
                 title="Mapillary View"
-                src={`https://www.mapillary.com/embed?image_key=${selectedImage.id}&style=split`}
+                src={`${import.meta.env.VITE_MAPILLARY_EMBED_URL || 'https://www.mapillary.com/embed'}?image_key=${selectedImage.id}&style=split`}
                 width="100%"
                 height="100%"
                 frameBorder="0"
@@ -493,7 +493,7 @@ export const MapView: React.FC<MapViewProps> = ({ issues, onIssueClick }) => {
                 </span>
               </div>
               <a 
-                href={`https://www.mapillary.com/app/?pKey=${selectedImage.id}`}
+                href={`${import.meta.env.VITE_MAPILLARY_APP_URL || 'https://www.mapillary.com/app'}/?pKey=${selectedImage.id}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition"

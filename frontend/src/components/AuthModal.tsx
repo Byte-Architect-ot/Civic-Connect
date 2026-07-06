@@ -88,7 +88,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         id: backendUser.id || backendUser._id,
         name: backendUser.name,
         role: mapRoleToFrontend(backendUser.role),
-        avatar: backendUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${backendUser.name}`,
+        avatar: backendUser.avatar || `${import.meta.env.VITE_DICEBEAR_API_URL}?seed=${backendUser.name}`,
         email: backendUser.email,
         phone: backendUser.phone || undefined,
         address: backendUser.address || undefined,

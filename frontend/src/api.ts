@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
-export const API_BASE = import.meta.env.PROD ? 'https://idt-lab.onrender.com' : '';
+export const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
-const API_PATH = import.meta.env.PROD ? 'https://idt-lab.onrender.com/api' : '/api';
+const API_PATH = import.meta.env.VITE_API_PATH || '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('nagriksetu_token');

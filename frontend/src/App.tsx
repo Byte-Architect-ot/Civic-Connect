@@ -106,7 +106,7 @@ export default function App() {
             id: backendUser.id || backendUser._id,
             name: backendUser.name,
             role: backendUser.role === 'admin' ? 'Staff' : 'Citizen',
-            avatar: backendUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${backendUser.name}`,
+            avatar: backendUser.avatar || `${import.meta.env.VITE_DICEBEAR_API_URL}?seed=${backendUser.name}`,
             email: backendUser.email,
             phone: backendUser.phone || undefined,
             address: backendUser.address || undefined,
