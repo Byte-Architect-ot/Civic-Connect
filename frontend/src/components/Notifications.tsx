@@ -49,7 +49,7 @@ export const Notifications: React.FC<NotificationsProps> = ({
           {unreadCount > 0 && (
             <button 
               onClick={onMarkAllAsRead}
-              className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-full text-sm font-semibold border-2 border-slate-200 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] text-slate-700 hover:bg-slate-100 rounded-full text-sm font-semibold border-2 border-slate-200 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
             >
               <CheckCheck size={16} />
               Mark All Read
@@ -58,7 +58,7 @@ export const Notifications: React.FC<NotificationsProps> = ({
           {notifications.length > 0 && (
             <button 
               onClick={onClearAll}
-              className="flex items-center gap-2 px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-full text-sm font-semibold border-2 border-rose-200 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] text-rose-600 hover:bg-rose-50 rounded-full text-sm font-semibold border-2 border-rose-200 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-400 outline-none"
             >
               <Trash2 size={16} />
               Clear All
@@ -78,7 +78,7 @@ export const Notifications: React.FC<NotificationsProps> = ({
             />
           ))
         ) : (
-          <div className="bg-white border-2 border-dashed border-slate-200 rounded-4xl p-20 flex flex-col items-center justify-center text-center">
+          <div className="bg-white border border-slate-200 rounded-3xl sm:rounded-4xl p-6 sm:p-12 md:p-20 flex flex-col items-center justify-center text-center">
             <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-4">
               <Bell size={48} />
             </div>
@@ -132,20 +132,20 @@ function NotificationCard({ notification, onClick }: { notification: Notificatio
       animate={{ opacity: 1, x: 0 }}
       whileHover={{ scale: 1.01 }}
       onClick={onClick}
-      className={`p-5 rounded-3xl border-2 transition-all cursor-pointer ${
+      className={`p-3 sm:p-4 md:p-5 rounded-2xl sm:rounded-3xl border-2 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-900 outline-none ${
         notification.isRead 
           ? 'bg-white border-slate-100 opacity-60 hover:opacity-80' 
           : 'bg-white border-slate-200 shadow-soft hover:shadow-soft-lg'
       }`}
     >
-      <div className="flex gap-4">
+      <div className="flex gap-3 sm:gap-4">
         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${getColor()}`}>
           {getIcon()}
         </div>
         
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+            <h3 className="font-semibold text-slate-900 flex items-center gap-2 break-words">
               {notification.title}
               {!notification.isRead && (
                 <span className="w-2 h-2 bg-slate-900 rounded-full shrink-0"></span>
@@ -158,7 +158,7 @@ function NotificationCard({ notification, onClick }: { notification: Notificatio
             )}
           </div>
           
-          <p className="text-slate-600 text-sm mb-3">
+          <p className="text-slate-600 text-sm mb-3 break-words">
             {notification.message}
           </p>
           

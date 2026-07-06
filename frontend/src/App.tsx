@@ -428,7 +428,7 @@ const exportFilteredData = async () => {
                   <button
                     key={cat}
                     onClick={() => setFilters(prev => ({ ...prev, category: cat as any }))}
-                    className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+                    className={`px-3.5 sm:px-5 py-2.5 sm:py-3 min-h-[40px] sm:min-h-[44px] rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none active:scale-95 ${
                       filters.category === cat 
                         ? 'bg-slate-900 text-white shadow-soft-lg' 
                         : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:shadow-soft'
@@ -487,13 +487,13 @@ const exportFilteredData = async () => {
 
             {/* Loading state */}
             {isLoadingData ? (
-              <div className="bg-white border border-slate-200 rounded-4xl p-20 flex flex-col items-center justify-center">
+              <div className="bg-white border border-slate-200 rounded-4xl p-10 sm:p-20 flex flex-col items-center justify-center">
                 <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <h3 className="text-xl font-display font-bold text-slate-900 mb-1">{t('Loading reports')}</h3>
                 <p className="text-sm text-slate-500">{t('Fetching latest data')}</p>
               </div>
             ) : filteredIssues.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {filteredIssues.map(issue => (
                   <IssueCard 
                     key={issue.id} 
@@ -505,7 +505,7 @@ const exportFilteredData = async () => {
                 ))}
               </div>
             ) : (
-              <div className="bg-white border-2 border-dashed border-slate-200 rounded-4xl p-20 flex flex-col items-center justify-center">
+              <div className="bg-white border-2 border-dashed border-slate-200 rounded-4xl p-10 sm:p-20 flex flex-col items-center justify-center">
                 <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-4">
                   <Search size={32} />
                 </div>
@@ -558,7 +558,7 @@ const exportFilteredData = async () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-[100dvh] bg-slate-50 flex pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] w-full overflow-x-hidden">
       {/* Sidebar backdrop for mobile */}
       {isSidebarOpen && (
         <div 
@@ -570,8 +570,8 @@ const exportFilteredData = async () => {
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{ width: isSidebarOpen ? 280 : 80 }}
-        className={`bg-white border-r border-slate-200 flex flex-col fixed md:sticky top-0 h-screen z-50 ${
+        animate={{ width: isSidebarOpen ? 260 : 80 }}
+        className={`bg-white border-r border-slate-200 flex flex-col fixed md:sticky top-[env(safe-area-inset-top)] h-[100dvh] z-50 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         } transition-transform duration-300 md:transition-none`}
       >
@@ -674,16 +674,16 @@ const exportFilteredData = async () => {
         </div> */}
 
         {/* Header */}
-        <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 flex-1 max-w-2xl">
+        <header className="h-14 md:h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-30 px-3 md:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-1 sm:gap-3 flex-1">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500"
+              className="p-2 sm:p-3 min-h-[40px] min-w-[40px] sm:min-h-[48px] sm:min-w-[48px] hover:bg-slate-100 rounded-xl transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none text-slate-500 flex items-center justify-center shrink-0"
             >
-              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {isSidebarOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
             
-            <div className="relative flex-1">
+            <div className="relative flex-1 hidden md:block max-w-2xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
               <input
                 type="text"
@@ -695,7 +695,7 @@ const exportFilteredData = async () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3 ml-2 md:ml-8">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 ml-1 sm:ml-2 md:ml-8 shrink-0">
             <div className="hidden sm:block">
               <LanguageSelector />
             </div>
@@ -703,7 +703,7 @@ const exportFilteredData = async () => {
             {currentUser.role === 'Citizen' && currentView !== 'Settings' && currentView !== 'Analytics' && (
               <button
                 onClick={() => setIsReportFormOpen(true)}
-                className="hidden sm:flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all"
+                className="hidden sm:flex items-center gap-2 px-6 py-3 min-h-[48px] bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none"
               >
                 <Plus size={20} />
                 {t('Report Issue')}
@@ -713,7 +713,7 @@ const exportFilteredData = async () => {
             {currentUser.role === 'Citizen' && currentView !== 'Settings' && currentView !== 'Analytics' && (
               <button
                 onClick={() => setIsReportFormOpen(true)}
-                className="sm:hidden w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-soft-lg transition-all"
+                className="sm:hidden w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-soft-lg transition-all shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none"
               >
                 <Plus size={20} />
               </button>
@@ -721,7 +721,7 @@ const exportFilteredData = async () => {
             
             <button 
               onClick={() => setCurrentView('Notifications')}
-              className="relative w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors"
+              className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-all shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
             >
               <Bell size={20} />
               {unreadCount > 0 && (
@@ -733,26 +733,40 @@ const exportFilteredData = async () => {
 
             <button
               onClick={fetchHazards}
-              className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-all shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
             >
               <RefreshCw size={18} />
             </button>
           </div>
         </header>
 
+        {/* Mobile Search Bar Row (Only visible on small screens) */}
+        <div className="md:hidden px-3 py-2.5 bg-white border-b border-slate-200 sticky top-14 z-20 shadow-sm">
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <input
+              type="text"
+              placeholder={t('Search issues')}
+              className="w-full pl-12 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-slate-200 focus:shadow-soft outline-none transition-all text-sm"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
         {/* Page content */}
-        <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full pb-20 md:pb-8">
+        <div className="p-3 sm:p-4 md:p-8 space-y-4 sm:space-y-6 md:space-y-8 max-w-7xl mx-auto w-full pb-20 md:pb-8">
           {/* Page header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
             <div>
-              <h1 className="text-4xl font-display font-bold tracking-tight mb-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold tracking-tight mb-1">
                 {currentView === 'Dashboard' ? (currentUser.role === 'Staff' ? t('Authority Dashboard') : t('Civic Portal')) :
                  currentView === 'MyReports' ? t('My Reports') :
                  currentView === 'MapView' ? t('Map View') :
                  currentView === 'Analytics' ? t('Analytics') :
                  currentView === 'Notifications' ? t('Notifications') : t('Settings')}
               </h1>
-              <p className="text-slate-500">
+              <p className="text-sm sm:text-base text-slate-500">
                 {currentView === 'Dashboard' ? (currentUser.role === 'Staff' ? t('Manage civic issues') : t('Track community issues')) :
                  currentView === 'MyReports' ? 'Your reported issues' :
                  currentView === 'MapView' ? 'Visual map of all issues' :
@@ -762,7 +776,7 @@ const exportFilteredData = async () => {
             </div>
             
             {(currentView === 'Dashboard' || currentView === 'MyReports') && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:gap-3">
                 <StatCard label={t('Total')} value={stats.total} icon={<ClipboardList size={16} />} color="slate" />
                 <StatCard label={t('Pending')} value={stats.pending} icon={<AlertCircle size={16} />} color="amber" />
                 <StatCard label={t('Active')} value={stats.inProgress} icon={<Clock size={16} />} color="blue" />
@@ -828,7 +842,7 @@ function NavItem({ icon, label, active = false, isOpen = true, onClick, badge }:
   return (
     <button 
       onClick={onClick}
-      className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${
+      className={`w-full flex items-center gap-3 p-3 min-h-[44px] rounded-2xl transition-all focus-visible:ring-2 focus-visible:ring-slate-900 outline-none active:scale-[0.98] ${
         active 
           ? 'bg-slate-900 text-white font-semibold shadow-soft' 
           : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -842,7 +856,7 @@ function NavItem({ icon, label, active = false, isOpen = true, onClick, badge }:
           </span>
         )}
       </div>
-      {isOpen && <span className="text-sm">{label}</span>}
+      {isOpen && <span className="text-sm flex-1 min-w-0 truncate text-left">{label}</span>}
       {badge !== undefined && isOpen && (
         <span className="ml-auto px-2 py-0.5 bg-rose-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
           {badge > 9 ? '9+' : badge}
@@ -868,7 +882,7 @@ function StatCard({ label, value, icon, color }: {
   };
 
   return (
-    <div className={`p-4 rounded-2xl border ${colors[color]} hover:shadow-soft transition-all`}>
+    <div className={`p-3 sm:p-4 rounded-2xl border shrink-0 min-w-[120px] sm:min-w-0 ${colors[color]} hover:shadow-soft transition-all`}>
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-semibold uppercase tracking-wide opacity-70">{label}</span>
         {icon}

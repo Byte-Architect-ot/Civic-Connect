@@ -122,7 +122,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -135,7 +135,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 100 }}
-        className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-4xl shadow-soft-xl overflow-hidden mt-auto sm:mt-0 max-h-[98vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="relative w-full max-w-md bg-white rounded-3xl sm:rounded-4xl shadow-soft-xl overflow-hidden max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         <button 
           onClick={handleClose}
@@ -165,7 +165,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               type="button"
               onClick={() => setRole('Citizen')}
               disabled={isLoading}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-semibold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 min-h-[44px] rounded-full text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-slate-900 outline-none active:scale-[0.97] ${
                 role === 'Citizen' 
                   ? 'bg-white text-slate-900 shadow-soft' 
                   : 'text-slate-500'
@@ -178,7 +178,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               type="button"
               onClick={() => setRole('Staff')}
               disabled={isLoading}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-semibold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 min-h-[44px] rounded-full text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-slate-900 outline-none active:scale-[0.97] ${
                 role === 'Staff' 
                   ? 'bg-white text-slate-900 shadow-soft' 
                   : 'text-slate-500'
@@ -202,7 +202,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                     required
                     placeholder={t('Enter your full name')}
                     disabled={isLoading}
-                    className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
+                    className={`w-full pl-10 pr-3 py-2.5 min-h-[44px] bg-slate-50 border-2 ${
                       errors.name ? 'border-rose-300 bg-rose-50' : 'border-transparent'
                     } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                     value={formData.name}
@@ -229,7 +229,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                   required
                   placeholder={t('name@example.com')}
                   disabled={isLoading}
-                  className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
+                  className={`w-full pl-10 pr-3 py-2.5 min-h-[44px] bg-slate-50 border-2 ${
                     errors.email ? 'border-rose-300 bg-rose-50' : 'border-transparent'
                   } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                   value={formData.email}
@@ -255,7 +255,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                   required
                   placeholder={t('Enter your password')}
                   disabled={isLoading}
-                  className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
+                  className={`w-full pl-10 pr-3 py-2.5 min-h-[44px] bg-slate-50 border-2 ${
                     errors.password ? 'border-rose-300 bg-rose-50' : 'border-transparent'
                   } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                   value={formData.password}
@@ -281,7 +281,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                     type="tel"
                     placeholder={t('+91 98765 43210')}
                     disabled={isLoading}
-                    className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
+                    className={`w-full pl-10 pr-3 py-2.5 min-h-[44px] bg-slate-50 border-2 ${
                       errors.phone ? 'border-rose-300 bg-rose-50' : 'border-transparent'
                     } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                     value={formData.phone}
@@ -309,7 +309,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                     required
                     placeholder={t('Enter admin key')}
                     disabled={isLoading}
-                    className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
+                    className={`w-full pl-10 pr-3 py-2.5 min-h-[44px] bg-slate-50 border-2 ${
                       errors.referralKey ? 'border-rose-300 bg-rose-50' : 'border-transparent'
                     } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                     value={formData.referralKey}
@@ -343,7 +343,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 shadow-soft-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-5"
+              className="w-full py-3 min-h-[48px] bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 shadow-soft-lg transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-5"
             >
               {isLoading ? (
                 <>
@@ -363,7 +363,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             <button
               onClick={switchMode}
               disabled={isLoading}
-              className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-50"
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all disabled:opacity-50 py-2 min-h-[44px] active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none rounded-lg px-2"
             >
               {mode === 'signin' 
                 ? t("Don't have an account? Sign Up") 

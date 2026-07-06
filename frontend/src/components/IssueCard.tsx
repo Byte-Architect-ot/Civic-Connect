@@ -74,7 +74,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       onClick={() => onClick(issue)}
-      className="bg-white border border-slate-200 rounded-3xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 group"
+      className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 group"
     >
       {hasImage && (
         <div className="relative h-40 md:h-48 overflow-hidden bg-slate-100">
@@ -101,7 +101,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
         </div>
       )}
 
-      <div className="p-4 md:p-5 space-y-3 md:space-y-4">
+      <div className="p-3 sm:p-4 md:p-5 space-y-2.5 sm:space-y-3 md:space-y-4">
         <div className="flex justify-between items-start gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -128,7 +128,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
               )}
             </div>
 
-            <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
               {issue.title}
             </h3>
 
@@ -180,7 +180,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
             {issue.assignedTo && (
               <div className="flex items-center gap-1 text-blue-600">
                 <User size={12} />
-                <span className="text-xs font-bold truncate max-w-[120px]">
+                <span className="text-xs font-bold truncate flex-1 min-w-0">
                   {issue.assignedTo}
                 </span>
               </div>
@@ -191,7 +191,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
         <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
           <button
             onClick={handleUpvoteClick}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-sm transition-all ${
+            className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl font-bold text-sm transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-400 outline-none ${
               hasUpvoted
                 ? 'bg-blue-50 text-blue-600 border border-blue-200'
                 : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-blue-300'

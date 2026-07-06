@@ -37,10 +37,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-soft-xl z-50 overflow-y-auto"
+            className="fixed right-0 top-0 bottom-0 w-full sm:max-w-md bg-white shadow-soft-xl z-50 overflow-y-auto"
           >
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center z-10">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-4 sm:p-6 flex justify-between items-center z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center">
                   <SlidersHorizontal size={20} className="text-slate-700" />
@@ -52,13 +52,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
               </div>
               <button 
                 onClick={onClose} 
-                className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-900"
+                className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-100 rounded-xl transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none text-slate-400 hover:text-slate-900 shrink-0"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="p-6 space-y-8">
+            <div className="p-4 sm:p-6 space-y-8">
               {/* Category Filter */}
               <FilterSection
                 icon={<Tag size={18} />}
@@ -70,7 +70,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                     <button
                       key={cat}
                       onClick={() => onFiltersChange({ ...filters, category: cat as any })}
-                      className={`px-4 py-3 rounded-full text-sm font-semibold transition-all ${
+                      className={`px-4 py-3 min-h-[44px] rounded-full text-sm font-semibold transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 outline-none ${
                         filters.category === cat
                           ? 'bg-slate-900 text-white shadow-soft-lg'
                           : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
@@ -93,7 +93,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                     <button
                       key={status}
                       onClick={() => onFiltersChange({ ...filters, status: status as any })}
-                      className={`px-4 py-3 rounded-full text-sm font-semibold transition-all ${
+                      className={`px-4 py-3 min-h-[44px] rounded-full text-sm font-semibold transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 outline-none ${
                         filters.status === status
                           ? 'bg-slate-900 text-white shadow-soft-lg'
                           : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
@@ -116,7 +116,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
                     <button
                       key={priority}
                       onClick={() => onFiltersChange({ ...filters, priority: priority as any })}
-                      className={`px-4 py-3 rounded-full text-sm font-semibold transition-all ${
+                      className={`px-4 py-3 min-h-[44px] rounded-full text-sm font-semibold transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 outline-none ${
                         filters.priority === priority
                           ? 'bg-slate-900 text-white shadow-soft-lg'
                           : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:border-slate-900'
@@ -187,13 +187,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, filte
             <div className="sticky bottom-0 bg-white border-t border-slate-200 p-6 space-y-3">
               <button
                 onClick={handleReset}
-                className="w-full px-6 py-3 rounded-full font-semibold text-slate-600 border-2 border-slate-200 hover:bg-slate-50 transition-all"
+                className="w-full px-6 py-3 min-h-[48px] rounded-full font-semibold text-slate-600 border-2 border-slate-200 hover:bg-slate-50 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
               >
                 Reset All Filters
               </button>
               <button
                 onClick={onClose}
-                className="w-full px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all"
+                className="w-full px-6 py-3 min-h-[48px] bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none"
               >
                 Apply Filters
               </button>

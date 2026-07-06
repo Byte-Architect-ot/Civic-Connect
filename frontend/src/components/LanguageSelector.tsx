@@ -36,7 +36,7 @@ export const LanguageSelector: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-slate-200 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all"
+        className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-white border-2 border-slate-200 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
       >
         <Globe size={18} className="text-slate-600" />
         {currentLang.name}
@@ -56,7 +56,7 @@ export const LanguageSelector: React.FC = () => {
               <button
                 key={lng.code}
                 onClick={() => handleLanguageChange(lng.code)}
-                className={`flex items-center justify-between w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 transition-colors ${
+                className={`flex items-center justify-between w-full text-left px-4 py-3 min-h-[44px] text-sm font-medium hover:bg-slate-50 transition-all active:bg-slate-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400 outline-none ${
                   i18n.language === lng.code ? 'text-slate-900 bg-slate-50' : 'text-slate-600'
                 }`}
               >

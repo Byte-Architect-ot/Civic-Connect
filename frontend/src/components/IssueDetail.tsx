@@ -70,10 +70,10 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl z-50 overflow-y-auto"
+            className="fixed right-0 top-0 bottom-0 w-full sm:max-w-2xl bg-white shadow-2xl z-50 overflow-y-auto"
           >
             {/* Sticky Header */}
-            <div className="sticky top-0 bg-white/95 backdrop-blur-md p-6 border-b border-slate-200 flex justify-between items-center z-10 shadow-sm">
+            <div className="sticky top-0 bg-white/95 backdrop-blur-md p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center z-10 shadow-sm">
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-black text-slate-900">Issue Details</h2>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold border ${statusColors[issue.status]}`}>
@@ -82,13 +82,13 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
               </div>
               <button 
                 onClick={onClose} 
-                className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-900"
+                className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-100 rounded-xl transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none text-slate-400 hover:text-slate-900 shrink-0"
               >
                 <X size={24} />
               </button>
             </div>
 
-            <div className="p-6 space-y-8">
+            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
               {/* Priority & Category */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -110,12 +110,12 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
 
               {/* Title */}
               <div>
-                <h1 className="text-3xl font-black text-slate-900 leading-tight mb-4">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mb-4 break-words">
                   {issue.title}
                 </h1>
                 
                 {/* Metadata Grid */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <MetadataItem 
                     icon={<MapPin size={16} />} 
                     label="Location" 
@@ -154,7 +154,7 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
                   <img 
                     src={resolveImageUrl(issue.imageUrl)} 
                     alt={issue.title} 
-                    className="w-full h-80 object-cover" 
+                    className="w-full h-48 sm:h-80 object-cover" 
                     referrerPolicy="no-referrer" 
                   />
                 </div>
@@ -166,7 +166,7 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
                   <FileText size={18} className="text-slate-400" />
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Description</h3>
                 </div>
-                <p className="text-slate-700 leading-relaxed font-medium">
+                <p className="text-slate-700 leading-relaxed font-medium break-words">
                   {issue.description}
                 </p>
               </div>
@@ -175,7 +175,7 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
               <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <button
                   onClick={handleUpvoteClick}
-                  className={`flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all ${
+                  className={`flex items-center gap-3 px-6 py-3 min-h-[48px] rounded-xl font-bold transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-400 outline-none ${
                     hasUpvoted 
                       ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
                       : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-blue-300'
@@ -229,7 +229,7 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
                       <button
                         key={s}
                         onClick={() => setSelectedStatus(s)}
-                        className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                        className={`px-4 py-3 min-h-[44px] rounded-xl text-sm font-bold transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-400 outline-none ${
                           selectedStatus === s 
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-300' 
                             : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-blue-300'
@@ -251,7 +251,7 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
                   <button
                     onClick={handleUpdate}
                     disabled={!newComment.trim()}
-                    className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-200 active:scale-95"
+                    className="w-full py-4 min-h-[48px] bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-200 active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 outline-none"
                   >
                     Post Update
                   </button>

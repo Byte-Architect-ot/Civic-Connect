@@ -49,15 +49,15 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-display font-bold tracking-tight">Account Settings</h2>
+          <h2 className="text-2xl sm:text-3xl font-display font-bold tracking-tight">Account Settings</h2>
           <p className="text-slate-500">Manage your profile and preferences</p>
         </div>
         {!editMode && (
           <button
             onClick={() => setEditMode(true)}
-            className="px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all"
+            className="px-6 py-3 min-h-[48px] bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none"
           >
             Edit Profile
           </button>
@@ -65,23 +65,23 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
       </div>
 
       {/* Profile Section */}
-      <section className="bg-white rounded-4xl border-2 border-slate-100 p-8">
+      <section className="bg-white rounded-4xl border-2 border-slate-100 p-4 sm:p-8">
         <h3 className="text-lg font-display font-bold mb-6">Profile Information</h3>
         
-        <div className="flex items-start gap-8 mb-8">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 mb-8 text-center sm:text-left">
           {/* Avatar */}
           <div className="relative">
             <img 
               src={user.avatar} 
               alt={user.name} 
-              className="w-32 h-32 rounded-3xl bg-slate-50 border-2 border-slate-200 object-cover" 
+              className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-slate-50 border-2 border-slate-200 object-cover" 
               referrerPolicy="no-referrer"
             />
           </div>
 
           {/* User Info */}
           <div className="flex-1 space-y-4">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
               <h3 className="text-2xl font-display font-bold">{user.name}</h3>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                 <Shield size={14} />
@@ -90,7 +90,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
             </div>
             
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 pt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
               <StatBox 
                 icon={<Award size={20} />} 
                 label="Reports Submitted" 
@@ -142,13 +142,13 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
           <div className="flex gap-3 mt-6 pt-6 border-t border-slate-100">
             <button
               onClick={handleCancel}
-              className="flex-1 px-6 py-3 rounded-full font-semibold text-slate-600 border-2 border-slate-200 hover:bg-slate-50 transition-all"
+              className="flex-1 px-6 py-3 min-h-[48px] rounded-full font-semibold text-slate-600 border-2 border-slate-200 hover:bg-slate-50 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 min-h-[48px] bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none flex items-center justify-center gap-2"
             >
               <Save size={18} />
               Save Changes
@@ -196,7 +196,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
       <section className="space-y-4">
         <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide ml-4">Security</h3>
         <div className="bg-white rounded-4xl border-2 border-slate-100 overflow-hidden">
-          <button className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors border-b border-slate-100">
+          <button className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50 transition-all border-b border-slate-100 min-h-[60px] active:bg-slate-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400 outline-none">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600">
                 <Lock size={20} />
@@ -208,7 +208,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
             </div>
           </button>
           
-          <button className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+          <button className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-slate-50 transition-all min-h-[60px] active:bg-slate-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400 outline-none">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600">
                 <Shield size={20} />
@@ -262,7 +262,7 @@ function SettingsField({
           type="text"
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
-          className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 focus:border-slate-900 focus:outline-none transition-all"
+          className="w-full px-4 py-3 min-h-[44px] rounded-2xl bg-white border-2 border-slate-200 text-slate-700 focus:border-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 transition-all"
         />
       ) : (
         <div className="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-100 text-slate-700">
@@ -300,7 +300,7 @@ function SettingsToggle({
       </div>
       <button
         onClick={() => onChange?.(!active)}
-        className={`w-14 h-7 rounded-full relative transition-colors shrink-0 ml-4 ${
+        className={`w-14 h-7 rounded-full relative transition-colors shrink-0 ml-4 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-400 outline-none ${
           active ? 'bg-slate-900' : 'bg-slate-300'
         }`}
       >

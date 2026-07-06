@@ -24,9 +24,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-[100dvh] bg-slate-50 w-full overflow-x-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-6 md:px-8 h-20 flex items-center justify-between">
+      <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 sm:px-6 md:px-8 h-16 sm:h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white">
             <Shield size={24} />
@@ -34,17 +34,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
           <span className="font-display font-bold text-xl tracking-tight">NagrikSetu</span>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           <LanguageSelector />
           <button 
             onClick={() => openAuth('signin')}
-            className="hidden sm:block px-5 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+            className="hidden sm:block px-5 py-2.5 min-h-[44px] text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none rounded-full"
           >
             {t('Sign In')}
           </button>
           <button 
             onClick={() => openAuth('signup')}
-            className="px-6 py-2.5 bg-slate-900 text-white rounded-full text-sm font-semibold hover:bg-slate-800 shadow-soft-lg transition-all"
+            className="px-5 sm:px-6 py-2.5 min-h-[44px] bg-slate-900 text-white rounded-full text-sm font-semibold hover:bg-slate-800 shadow-soft-lg transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none"
           >
             {t('Get Started')}
           </button>
@@ -52,44 +52,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
       </nav>
 
       {/* Hero Section */}
-      <main className="pt-20">
-        <section className="px-6 md:px-8 py-24 md:py-32 max-w-5xl mx-auto text-center">
+      <main className="pt-16 sm:pt-20">
+        <section className="px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32 max-w-5xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-block px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-full mb-6">
+            <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-900 text-white text-[10px] sm:text-xs font-semibold rounded-full mb-4 sm:mb-6">
               {t('Empowering Citizens, Improving Cities')}
             </span>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight mb-6">
               {t('Bridge the Gap.')} <br />
               {t('Build the Future.')}
             </h1>
             
-            <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
               {t('Report civic issues, track progress, and collaborate with authorities to build better communities')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
                 onClick={() => openAuth('signup')}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-full text-base font-semibold hover:bg-slate-800 shadow-soft-xl transition-all group"
+                className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[48px] bg-slate-900 text-white rounded-full text-sm sm:text-base font-semibold hover:bg-slate-800 shadow-soft-xl transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 outline-none group"
               >
                 {t('Get Started Now')}
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
               <button 
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="inline-flex items-center justify-center px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-full text-base font-semibold hover:bg-slate-50 transition-all"
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3.5 sm:py-4 min-h-[48px] bg-white border-2 border-slate-200 text-slate-700 rounded-full text-sm sm:text-base font-semibold hover:bg-slate-50 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-slate-400 outline-none"
               >
                 {t('Learn More')}
               </button>
             </div>
 
             {/* Simple stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-16 max-w-2xl mx-auto">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-10 sm:pt-16 max-w-2xl mx-auto">
               <StatItem label={t('Active Users')} value="10k+" />
               <StatItem label={t('Issues Resolved')} value="5k+" />
               <StatItem label={t('Cities')} value="12+" />
@@ -98,7 +98,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-24 px-6 md:px-8 bg-white">
+        <section id="features" className="py-16 sm:py-24 px-4 sm:px-6 md:px-8 bg-white">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <span className="inline-block px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-full mb-4">
@@ -136,9 +136,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </section>
 
         {/* Benefits Section */}
-        <section className="py-24 px-6 md:px-8 bg-slate-50">
+        <section className="py-16 sm:py-24 px-4 sm:px-6 md:px-8 bg-slate-50">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center">
               <div>
                 <span className="inline-block px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-full mb-6">
                   {t('Why Choose NagrikSetu')}
@@ -181,7 +181,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 px-6 md:px-8 bg-slate-900 text-white">
+        <section className="py-16 sm:py-24 px-4 sm:px-6 md:px-8 bg-slate-900 text-white">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 tracking-tight">
               {t('Ready to Make a Difference?')}
@@ -191,7 +191,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             </p>
             <button 
               onClick={() => openAuth('signup')}
-              className="inline-flex items-center gap-2 px-10 py-5 bg-white text-slate-900 rounded-full font-semibold text-lg hover:shadow-soft-xl transition-all group"
+              className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 min-h-[48px] bg-white text-slate-900 rounded-full font-semibold text-base sm:text-lg hover:shadow-soft-xl transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-white outline-none group"
             >
               {t('Start Reporting Issues')}
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -200,7 +200,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </section>
 
         {/* Footer */}
-        <footer className="bg-white py-12 px-6 md:px-8 border-t border-slate-200">
+        <footer className="bg-white py-12 px-4 sm:px-6 md:px-8 border-t border-slate-200 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div className="max-w-6xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white">
@@ -233,7 +233,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 function StatItem({ label, value }: { label: string, value: string }) {
   return (
     <div>
-      <p className="text-3xl font-display font-bold text-slate-900 mb-1">{value}</p>
+      <p className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-1">{value}</p>
       <p className="text-sm text-slate-500">{label}</p>
     </div>
   );
@@ -252,7 +252,7 @@ function FeatureCard({ step, icon, title, description }: {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
-      className="relative p-8 bg-white rounded-4xl border-2 border-slate-100 hover:border-slate-200 hover:shadow-soft-lg transition-all"
+      className="relative p-5 sm:p-8 bg-white rounded-3xl sm:rounded-4xl border-2 border-slate-100 hover:border-slate-200 hover:shadow-soft-lg transition-all"
     >
       <div className="absolute top-6 right-6 text-6xl font-display font-bold text-slate-50">
         {step}
