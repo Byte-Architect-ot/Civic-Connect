@@ -257,16 +257,12 @@ export default function App() {
   const stats = useMemo(() => {
     if (!currentUser) return { total: 0, resolved: 0, pending: 0, inProgress: 0, critical: 0 };
 
-    const userIssues = currentUser.role === 'Citizen' 
-      ? issues.filter(i => i.reportedBy === currentUser.name)
-      : issues;
-
     return {
-      total: userIssues.length,
-      resolved: userIssues.filter(i => i.status === 'Resolved').length,
-      pending: userIssues.filter(i => i.status === 'Pending').length,
-      inProgress: userIssues.filter(i => i.status === 'In Progress').length,
-      critical: userIssues.filter(i => i.priority === 'Critical').length,
+      total: issues.length,
+      resolved: issues.filter(i => i.status === 'Resolved').length,
+      pending: issues.filter(i => i.status === 'Pending').length,
+      inProgress: issues.filter(i => i.status === 'In Progress').length,
+      critical: issues.filter(i => i.priority === 'Critical').length,
     };
   }, [issues, currentUser]);
 
