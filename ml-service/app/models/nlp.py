@@ -4,10 +4,14 @@ import re
 
 class IssueClassifier:
     def __init__(self):
-        # Using zero-shot classification (no training needed!)
+        import torch
+        # Limit threads to save memory in constrained environments
+        torch.set_num_threads(1)
+        
+        # Using zero-shot classification with a smaller model to fit in 512MB RAM limit
         self.classifier = pipeline(
             "zero-shot-classification",
-            model="facebook/bart-large-mnli"
+            model="typeform/distilbert-base-uncased-mnli"
         )
         
         self.categories = [

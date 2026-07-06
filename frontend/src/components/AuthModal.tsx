@@ -135,162 +135,162 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 100 }}
-        className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-4xl shadow-soft-xl overflow-hidden mt-auto sm:mt-0 max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-4xl shadow-soft-xl overflow-hidden mt-auto sm:mt-0 max-h-[98vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         <button 
           onClick={handleClose}
-          className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 z-10"
+          className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 z-10"
           disabled={isLoading}
         >
           <X size={20} />
         </button>
 
-        <div className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center text-white shadow-soft-lg mx-auto mb-4">
-              <Shield size={32} />
+        <div className="p-5 sm:p-6">
+          <div className="text-center mb-4">
+            <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-soft-lg mx-auto mb-3">
+              <Shield size={24} />
             </div>
-            <h2 className="text-3xl font-display font-bold tracking-tight">
+            <h2 className="text-2xl font-display font-bold tracking-tight">
               {mode === 'signin' ? t('Welcome Back') : t('Create Account')}
             </h2>
-            <p className="text-slate-500 text-sm mt-2">
+            <p className="text-slate-500 text-xs mt-1">
               {mode === 'signin' 
                 ? t('Sign in to access your account')
                 : t('Join the community and make a difference')}
             </p>
           </div>
 
-          <div className="flex p-1.5 bg-slate-100 rounded-full mb-8">
+          <div className="flex p-1 bg-slate-100 rounded-full mb-5">
             <button
               type="button"
               onClick={() => setRole('Citizen')}
               disabled={isLoading}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-sm font-semibold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-semibold transition-all ${
                 role === 'Citizen' 
                   ? 'bg-white text-slate-900 shadow-soft' 
                   : 'text-slate-500'
               }`}
             >
-              <UserIcon size={16} />
+              <UserIcon size={14} />
               {t('Citizen')}
             </button>
             <button
               type="button"
               onClick={() => setRole('Staff')}
               disabled={isLoading}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-sm font-semibold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-semibold transition-all ${
                 role === 'Staff' 
                   ? 'bg-white text-slate-900 shadow-soft' 
                   : 'text-slate-500'
               }`}
             >
-              <Shield size={16} />
+              <Shield size={14} />
               {t('Authority')}
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {mode === 'signup' && (
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide ml-1">
                   {t('Full Name')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
                     type="text"
                     required
                     placeholder={t('Enter your full name')}
                     disabled={isLoading}
-                    className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
+                    className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
                       errors.name ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                    } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
+                    } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 {errors.name && (
-                  <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
-                    <AlertCircle size={12} />
+                  <p className="text-rose-600 text-[10px] flex items-center gap-1 ml-1">
+                    <AlertCircle size={10} />
                     {errors.name}
                   </p>
                 )}
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
+            <div className="space-y-1">
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide ml-1">
                 {t('Email Address')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input
                   type="email"
                   required
                   placeholder={t('name@example.com')}
                   disabled={isLoading}
-                  className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
+                  className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
                     errors.email ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                  } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
+                  } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
               {errors.email && (
-                <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
-                  <AlertCircle size={12} />
+                <p className="text-rose-600 text-[10px] flex items-center gap-1 ml-1">
+                  <AlertCircle size={10} />
                   {errors.email}
                 </p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
+            <div className="space-y-1">
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide ml-1">
                 {t('Password')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input
                   type="password"
                   required
                   placeholder={t('Enter your password')}
                   disabled={isLoading}
-                  className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
+                  className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
                     errors.password ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                  } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
+                  } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                   value={formData.password}
                   onChange={e => setFormData({ ...formData, password: e.target.value })}
                 />
               </div>
               {errors.password && (
-                <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
-                  <AlertCircle size={12} />
+                <p className="text-rose-600 text-[10px] flex items-center gap-1 ml-1">
+                  <AlertCircle size={10} />
                   {errors.password}
                 </p>
               )}
             </div>
 
             {mode === 'signup' && (
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide ml-1">
                   {t('Phone Number')}
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
                     type="tel"
                     placeholder={t('+91 98765 43210')}
                     disabled={isLoading}
-                    className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
+                    className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
                       errors.phone ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                    } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
+                    } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                     value={formData.phone}
                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
                   />
                 </div>
                 {errors.phone && (
-                  <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
-                    <AlertCircle size={12} />
+                  <p className="text-rose-600 text-[10px] flex items-center gap-1 ml-1">
+                    <AlertCircle size={10} />
                     {errors.phone}
                   </p>
                 )}
@@ -298,32 +298,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             )}
 
             {role === 'Staff' && (
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide ml-1">
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide ml-1">
                   {t('Admin Key')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
                     type="password"
                     required
                     placeholder={t('Enter admin key')}
                     disabled={isLoading}
-                    className={`w-full pl-12 pr-4 py-3 bg-slate-50 border-2 ${
+                    className={`w-full pl-10 pr-3 py-2 bg-slate-50 border-2 ${
                       errors.referralKey ? 'border-rose-300 bg-rose-50' : 'border-transparent'
-                    } focus:border-slate-900 rounded-2xl outline-none transition-all text-sm`}
+                    } focus:border-slate-900 rounded-xl outline-none transition-all text-sm`}
                     value={formData.referralKey}
                     onChange={e => setFormData({ ...formData, referralKey: e.target.value })}
                   />
                 </div>
                 {errors.referralKey ? (
-                  <p className="text-rose-600 text-xs flex items-center gap-1 ml-1">
-                    <AlertCircle size={12} />
+                  <p className="text-rose-600 text-[10px] flex items-center gap-1 ml-1">
+                    <AlertCircle size={10} />
                     {errors.referralKey}
                   </p>
                 ) : (
-                  <p className="text-xs text-slate-500 ml-1">
-                    {t('Authority admin key:')} <code className="px-2 py-0.5 bg-slate-100 rounded font-mono">CIVIC_ADMIN_2026</code>
+                  <p className="text-[10px] text-slate-500 ml-1 mt-1">
+                    {t('Authority admin key:')} <code className="px-1.5 py-0.5 bg-slate-100 rounded font-mono">CIVIC_ADMIN_2026</code>
                   </p>
                 )}
               </div>
@@ -333,9 +333,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-rose-50 border-2 border-rose-200 rounded-2xl text-rose-700 text-sm flex items-start gap-3"
+                className="p-3 bg-rose-50 border-2 border-rose-200 rounded-xl text-rose-700 text-xs flex items-start gap-2"
               >
-                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                <AlertCircle size={14} className="shrink-0 mt-0.5" />
                 {errors.general}
               </motion.div>
             )}
@@ -343,27 +343,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 shadow-soft-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 shadow-soft-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-5"
             >
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   {t('Processing...')}
                 </>
               ) : (
                 <>
-                  <CheckCircle2 size={18} />
+                  <CheckCircle2 size={16} />
                   {mode === 'signin' ? t('Sign In') : t('Create Account')}
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-5 text-center">
             <button
               onClick={switchMode}
               disabled={isLoading}
-              className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-50"
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-50"
             >
               {mode === 'signin' 
                 ? t("Don't have an account? Sign Up") 
@@ -371,9 +371,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             </button>
           </div>
 
-          <div className="mt-6 p-4 bg-slate-100 rounded-2xl">
-            <p className="text-xs font-semibold text-slate-700 mb-2">Info</p>
-            <div className="space-y-1 text-xs text-slate-600">
+          <div className="mt-5 p-3 bg-slate-100 rounded-xl">
+            <p className="text-[10px] font-semibold text-slate-700 mb-1 uppercase">Info</p>
+            <div className="space-y-0.5 text-[10px] text-slate-600">
               <p>{t('Register as Citizen to report issues')}</p>
               <p>{t('Register as Authority to manage issues')}</p>
               <p>{t('Authority admin key:')} <code className="px-1 py-0.5 bg-white rounded font-mono">CIVIC_ADMIN_2026</code></p>
