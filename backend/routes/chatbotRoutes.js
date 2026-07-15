@@ -10,6 +10,8 @@ router.post('/query', async (req, res) => {
     const chatbotUrl = process.env.CHATBOT_SERVICE_URL || 'http://localhost:5000';
     const response = await axios.post(`${chatbotUrl}/api/chatbot/query`, {
       message
+    }, {
+      timeout: 60000 // Safely wait out standard Render free-tier cold starts
     });
     
     // Return the reply directly

@@ -5,7 +5,7 @@ const { ingestPDF, queryChatbot } = require('./engine');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
@@ -42,6 +42,6 @@ app.post('/api/chatbot/query', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Chatbot microservice listening on port ${PORT}`);
 });

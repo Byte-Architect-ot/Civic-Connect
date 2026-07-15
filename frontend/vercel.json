@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://idt-lab-1.onrender.com/api/:path*"
+      "destination": "https://idt-lab.onrender.com/api/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://idt-lab-1.onrender.com/uploads/:path*"
+      "destination": "https://idt-lab.onrender.com/uploads/:path*"
     },
     {
       "source": "/(.*)",
