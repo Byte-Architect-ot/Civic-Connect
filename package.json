@@ -1,0 +1,29 @@
+{
+  "name": "idt",
+  "version": "1.0.0",
+  "description": "NagrikSetu is an intelligent civic issue tracking and management platform that connects citizens with local authorities. By leveraging a modern Web Stack and advanced Machine Learning (NLP & Clustering), it automates issue categorization, determines urgency, and prevents duplicate reports.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\" \"npm run start:chatbot\" \"npm run start:ml\"",
+    "start:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd backend && npm start",
+    "start:chatbot": "cd chatbot-service && npm start",
+    "start:ml": "cd ml-service && venv\\Scripts\\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
+    "install:all": "cd frontend && npm install && cd ../backend && npm install && cd ../chatbot-service && npm install && cd ../ml-service && python -m venv venv && venv\\Scripts\\activate && pip install -r requirements.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Byte-Architect-ot/IDT-lab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Byte-Architect-ot/IDT-lab/issues"
+  },
+  "homepage": "https://github.com/Byte-Architect-ot/IDT-lab#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}

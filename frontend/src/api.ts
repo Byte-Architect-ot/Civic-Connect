@@ -1,8 +1,7 @@
 /// <reference types="vite/client" />
-export const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://idt-lab-1.onrender.com';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://idt-lab-1.onrender.com';
-const API_PATH = API_URL + (import.meta.env.VITE_API_PATH || '/api');
+export const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+// Use a relative path so all requests go through Vite's proxy (no CORS)
+const API_PATH = import.meta.env.VITE_API_PATH || '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('nagriksetu_token');
@@ -32,10 +31,20 @@ async function request(endpoint: string, options: RequestInit = {}): Promise<any
     headers
   });
 
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch (err) {
+    // If response is not valid JSON, it's likely an HTML error page (e.g. 502/404)
+    if (!res.ok) {
+      throw new Error(`Server Error (${res.status}): ${text.slice(0, 100)}...`);
+    }
+    throw new Error('Invalid JSON response from server');
+  }
 
   if (!res.ok) {
-    throw new Error(data.message || 'Request failed');
+    throw new Error(data.message || data.error || 'Request failed');
   }
 
   return data;
@@ -56,10 +65,19 @@ async function requestFormData(endpoint: string, formData: FormData): Promise<an
     body: formData
   });
 
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch (err) {
+    if (!res.ok) {
+      throw new Error(`Server Error (${res.status}): ${text.slice(0, 100)}...`);
+    }
+    throw new Error('Invalid JSON response from server');
+  }
 
   if (!res.ok) {
-    throw new Error(data.message || 'Request failed');
+    throw new Error(data.message || data.error || 'Request failed');
   }
 
   return data;
@@ -175,6 +193,15 @@ export async function apiDeleteHazard(id: string) {
   });
 }
 
+// ─── Chatbot ──────────────────────────────
+
+export async function apiQueryChatbot(message: string) {
+  return await request('/chatbot/query', {
+    method: 'POST',
+    body: JSON.stringify({ message })
+  });
+}
+
 // ─── Helpers ──────────────────────────────
 
 /** Resolve an imageUrl to its full display URL (handles both server paths and external URLs) */
@@ -196,7 +223,7 @@ export const exportToExcel = async (): Promise<void> => {
   if (!token) throw new Error('No authentication token');
 
   try {
-    const response = await fetch(`${API_BASE}/api/export/excel`, {
+    const response = await fetch(`/api/export/excel`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -234,7 +261,7 @@ export const exportFilteredToExcel = async (filters: {
   if (!token) throw new Error('No authentication token');
 
   try {
-    const response = await fetch(`${API_BASE}/api/export/excel/filtered`, {
+    const response = await fetch(`/api/export/excel/filtered`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

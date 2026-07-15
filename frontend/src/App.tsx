@@ -43,6 +43,7 @@ import {
 } from './api';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from './components/LanguageSelector';
+import { ChatbotWidget } from './components/ChatbotWidget';
 
 type View = 'Dashboard' | 'MyReports' | 'MapView' | 'Notifications' | 'Settings' | 'Analytics';
 
@@ -822,6 +823,8 @@ const exportFilteredData = async () => {
         filters={filters}
         onFiltersChange={setFilters}
       />
+      
+      <ChatbotWidget />
     </div>
   );
 }
