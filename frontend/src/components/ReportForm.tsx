@@ -50,7 +50,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
       const response = await axios.post(`${ML_SERVICE_URL}/api/ml/categorize/analyze`, {
         title,
         description
-      }, { timeout: 10000 });
+      }, { timeout: 60000 });
 
       setMlSuggestions(response.data);
       
