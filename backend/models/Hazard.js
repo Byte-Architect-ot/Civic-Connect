@@ -27,6 +27,11 @@ const hazardSchema = new mongoose.Schema({
     default: 'Pending' 
   },
   location: { type: String, default: '' },
+  locationName: { type: String, default: '' },
+  locationGeo: {
+    type: { type: String, enum: ['Point'], default: 'Point' },
+    coordinates: { type: [Number], default: [0, 0] }
+  },
   lat: { type: Number, default: 0 },
   lng: { type: Number, default: 0 },
   imageUrl: { type: String, default: '' },
@@ -58,5 +63,7 @@ hazardSchema.set('toJSON', {
     return ret;
   }
 });
+
+hazardSchema.index({ locationGeo: '2dsphere' });
 
 module.exports = mongoose.model('Hazard', hazardSchema);

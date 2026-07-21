@@ -40,7 +40,10 @@ app.use(middleware.handle(i18n));
 // Serve uploaded images statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI, {
+  serverSelectionTimeoutMS: 10000,
+  family: 4 // Force IPv4 to prevent Node.js 17+ from hanging on IPv6
+})
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 

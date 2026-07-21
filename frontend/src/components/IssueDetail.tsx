@@ -6,6 +6,17 @@ import {
 } from 'lucide-react';
 import { CivicIssue, IssueStatus, IssueUpdate } from '../types';
 import { resolveImageUrl } from '../api';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix default Leaflet marker icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: import.meta.env.VITE_LEAFLET_MARKER_ICON_2X || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: import.meta.env.VITE_LEAFLET_MARKER_ICON || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: import.meta.env.VITE_LEAFLET_MARKER_SHADOW || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface IssueDetailProps {
   issue: CivicIssue;
@@ -170,6 +181,29 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
                   {issue.description}
                 </p>
               </div>
+
+              {/* Map Section */}
+              {issue.lat && issue.lng && (
+                <div className="rounded-3xl overflow-hidden border border-slate-200 shadow-lg h-64 sm:h-80 z-0 relative">
+                  <MapContainer 
+                    center={[issue.lat, issue.lng]} 
+                    zoom={15} 
+                    scrollWheelZoom={false} 
+                    className="w-full h-full"
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker position={[issue.lat, issue.lng]}>
+                      <Popup>
+                        <div className="font-bold text-slate-900">{issue.category}</div>
+                        <div className="text-xs text-slate-600 mt-1">{issue.location}</div>
+                      </Popup>
+                    </Marker>
+                  </MapContainer>
+                </div>
+              )}
 
               {/* Upvote Section */}
               <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">

@@ -33,6 +33,7 @@ const upload = multer({
 });
 
 const mlService = require('../services/mlService');
+const geoService = require('../services/geoService');
 
 // Analyze text for ML suggestions (Proxy to ML Service)
 router.post('/analyze', authMiddleware, async (req, res) => {
@@ -98,6 +99,24 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       aiTags = ['Unverified Image', 'User Reported'];
     }
 
+    // GeoCoding logic
+    let finalLat = lat ? parseFloat(lat) : 0;
+    let finalLng = lng ? parseFloat(lng) : 0;
+    
+    if ((finalLat === 0 || finalLng === 0) && location) {
+      const geoResult = await geoService.geocodeAddress(location);
+      if (geoResult) {
+        finalLat = geoResult.lat;
+        finalLng = geoResult.lng;
+      }
+    }
+    
+    // Fallback if completely unresolved
+    if (finalLat === 0 && finalLng === 0) {
+      finalLat = 16.8 + Math.random() * 0.1;
+      finalLng = 74.5 + Math.random() * 0.2;
+    }
+
     // 🤖 ML ENHANCEMENT 2: Check for duplicates
     const existingIssues = await Hazard.find({
       status: { $in: ['Pending', 'In Progress'] },
@@ -106,10 +125,10 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     }).select('_id title lat lng').lean();
 
     let duplicateCheck = { hasDuplicates: false, duplicates: [] };
-    if (lat && lng && existingIssues.length > 0) {
+    if (existingIssues.length > 0) {
       duplicateCheck = await mlService.checkDuplicates(
-        parseFloat(lat), 
-        parseFloat(lng), 
+        finalLat, 
+        finalLng, 
         existingIssues.map(issue => ({
           id: issue._id.toString(),
           lat: issue.lat,
@@ -127,9 +146,14 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       aiTags: aiTags,
       priority: mlAnalysis?.priority || priority || 'Medium',
       location: location || '',
+      locationName: location || '',
+      locationGeo: {
+        type: 'Point',
+        coordinates: [finalLng, finalLat] // GeoJSON requires [longitude, latitude]
+      },
       imageUrl,
-      lat: lat ? parseFloat(lat) : (16.8 + Math.random() * 0.1),
-      lng: lng ? parseFloat(lng) : (74.5 + Math.random() * 0.2),
+      lat: finalLat,
+      lng: finalLng,
       status: 'Pending',
       reportedBy: user.name,
       reportedByUserId: user._id,
