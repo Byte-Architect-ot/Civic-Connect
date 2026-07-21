@@ -12,9 +12,10 @@ const hazardSchema = new mongoose.Schema({
   description: { type: String, required: true },
   category: { 
     type: String, 
-    enum: ['Roads', 'Garbage', 'Water', 'Electricity', 'Public Health', 'Others'], 
-    default: 'Others' 
+    default: 'Unclassified' 
   },
+  userCategory: { type: String, default: '' },
+  aiTags: [{ type: String }],
   priority: { 
     type: String, 
     enum: ['Low', 'Medium', 'High', 'Critical'], 

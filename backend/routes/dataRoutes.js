@@ -34,6 +34,21 @@ const upload = multer({
 
 const mlService = require('../services/mlService');
 
+// Analyze text for ML suggestions (Proxy to ML Service)
+router.post('/analyze', authMiddleware, async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    if (!title || !description) {
+      return res.status(400).json({ message: 'Title and description required' });
+    }
+    const analysis = await mlService.analyzeIssue(title, description);
+    res.json(analysis || { detected: false });
+  } catch (error) {
+    console.error('Proxy ML analysis error:', error);
+    res.status(500).json({ message: 'Server error during ML analysis' });
+  }
+});
+
 // Create a new hazard report (with optional image upload)
 router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   try {
@@ -44,15 +59,43 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
 
     // If a file was uploaded, store its base64 string; otherwise empty string
     let imageUrl = '';
+    let mlAnalysis = null;
+    let finalCategory = 'Unclassified';
+    let aiTags = [];
+
     if (req.file) {
       const base64Str = req.file.buffer.toString('base64');
       imageUrl = `data:${req.file.mimetype};base64,${base64Str}`;
+      
+      // 🤖 ML ENHANCEMENT 1: Computer Vision Classification
+      try {
+        mlAnalysis = await mlService.classifyImage(req.file.buffer);
+      } catch (err) {
+        console.error('Image classification error:', err);
+      }
+    }
+    
+    // Fallback to text analysis if image classification didn't happen or failed to detect
+    if ((!mlAnalysis || mlAnalysis.detected !== true) && title && description) {
+      try {
+        const textAnalysis = await mlService.analyzeIssue(title, description);
+        if (textAnalysis && !mlAnalysis) {
+          mlAnalysis = textAnalysis;
+        }
+      } catch (err) {
+        console.error('Text analysis error:', err);
+      }
     }
 
-    // 🤖 ML ENHANCEMENT 1: Auto-categorize and detect severity
-    let mlAnalysis = null;
-    if (title && description) {
-      mlAnalysis = await mlService.analyzeIssue(title, description);
+    // OVERRIDE CATEGORY logic
+    if (mlAnalysis && mlAnalysis.detected === true) {
+      finalCategory = mlAnalysis.category;
+      const conf = mlAnalysis.confidence || mlAnalysis.category_confidence || 0;
+      const sev = mlAnalysis.severity || mlAnalysis.priority || 'Unknown';
+      aiTags = [mlAnalysis.category, `AI Confidence: ${conf}%`, `Severity: ${sev}`];
+    } else {
+      finalCategory = category || 'Others';
+      aiTags = ['Unverified Image', 'User Reported'];
     }
 
     // 🤖 ML ENHANCEMENT 2: Check for duplicates
@@ -79,7 +122,9 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     const newHazard = new Hazard({
       title,
       description,
-      category: mlAnalysis?.category || category || 'Others',
+      category: finalCategory,
+      userCategory: category || 'Unclassified',
+      aiTags: aiTags,
       priority: mlAnalysis?.priority || priority || 'Medium',
       location: location || '',
       imageUrl,
@@ -94,7 +139,7 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       // ML fields
       mlCategory: mlAnalysis?.category || '',
       mlPriority: mlAnalysis?.priority || '',
-      mlConfidence: mlAnalysis?.category_confidence || 0,
+      mlConfidence: mlAnalysis?.category_confidence || mlAnalysis?.confidence || 0,
       clusterSize: duplicateCheck.count || 0,
       duplicateOf: duplicateCheck.duplicates ? duplicateCheck.duplicates.map(d => d.id) : []
     });
@@ -110,7 +155,7 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     // Send response with hazard and ML metadata
     res.status(201).json({
       ...savedHazard.toJSON(),
-      mlSuggestions: mlAnalysis,
+      mlAnalysis,
       duplicateWarning: duplicateCheck.hasDuplicates ? {
         message: `Found ${duplicateCheck.count} similar issue(s) nearby`,
         duplicates: duplicateCheck.duplicates

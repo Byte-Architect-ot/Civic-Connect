@@ -144,6 +144,13 @@ export function hasToken(): boolean {
 
 // ─── Hazards ──────────────────────────────
 
+export async function apiAnalyzeText(title: string, description: string) {
+  return await request('/data/analyze', {
+    method: 'POST',
+    body: JSON.stringify({ title, description })
+  });
+}
+
 export async function apiGetAllHazards() {
   return await request('/data/all');
 }

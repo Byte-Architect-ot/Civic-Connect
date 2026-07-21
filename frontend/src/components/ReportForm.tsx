@@ -4,6 +4,7 @@ import { X, Upload, MapPin, AlertTriangle, Camera, FileText, Tag, TrendingUp, Tr
 import { IssueCategory, IssuePriority } from '../types';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { apiAnalyzeText } from '../api';
 
 const ML_SERVICE_URL = import.meta.env.VITE_ML_SERVICE_URL || 'http://localhost:8000';
 
@@ -47,19 +48,20 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
 
     setIsAnalyzing(true);
     try {
-      const response = await axios.post(`${ML_SERVICE_URL}/api/ml/categorize/analyze`, {
-        title,
-        description
-      }, { timeout: 60000 });
+      const response = await apiAnalyzeText(title, description);
 
-      setMlSuggestions(response.data);
+      setMlSuggestions(response);
       
-      // Auto-apply ML suggestions
-      setFormData(prev => ({
-        ...prev,
-        category: response.data.category || prev.category,
-        priority: response.data.priority || prev.priority
-      }));
+      // Auto-apply ML suggestions if valid
+      setFormData(prev => {
+        const newCat = response.category;
+        const newPri = response.priority;
+        return {
+          ...prev,
+          category: categories.includes(newCat as any) ? newCat : prev.category,
+          priority: priorities.includes(newPri as any) ? newPri : prev.priority
+        };
+      });
     } catch (error) {
       console.error('ML analysis failed:', error);
       setMlSuggestions(null);
