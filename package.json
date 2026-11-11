@@ -9,7 +9,11 @@
     "start:backend": "cd backend && npm start",
     "start:chatbot": "cd chatbot-service && npm start",
     "start:ml": "node scripts/start-ml.js",
-    "install:all": "node scripts/install-all.js"
+    "install:all": "node scripts/install-all.js",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "repository": {
     "type": "git",
