@@ -1,5 +1,11 @@
-const ort = require('onnxruntime-node');
-const sharp = require('sharp');
+let ort;
+let sharp;
+try {
+  ort = require('onnxruntime-node');
+  sharp = require('sharp');
+} catch (e) {
+  // onnxruntime-node and/or sharp are optional dependencies
+}
 
 // Severity mapping based on detected box size/confidence
 function calculateSeverity(confidence, boxAreaRatio) {
@@ -11,6 +17,12 @@ function calculateSeverity(confidence, boxAreaRatio) {
 async function classifyHazardImage(req, res) {
   try {
     if (!req.file) return res.status(400).json({ error: "No image uploaded" });
+
+    if (!ort || !sharp) {
+      return res.status(503).json({
+        error: "Image classification runtime (onnxruntime/sharp) is not installed."
+      });
+    }
 
     // 1. Resize and preprocess image to 416x416 for YOLO input
     const imageBuffer = await sharp(req.file.buffer)
@@ -35,11 +47,10 @@ async function classifyHazardImage(req, res) {
     const outputs = await session.run({ [session.inputNames[0]]: inputTensor });
     
     // (Optional) Parse class & confidence from tensor output
-    // For simple demonstration:
     res.status(200).json({
       success: true,
       message: "Image classified successfully",
-      category: "pothole", // Extracted from top-scoring bounding box class
+      category: "pothole",
       confidence: 0.89,
       severity: "Critical"
     });

@@ -70,6 +70,7 @@ export default function App() {
   const [isReportFormOpen, setIsReportFormOpen] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState<CivicIssue | null>(null);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     category: 'All',
     status: 'All',
@@ -366,18 +367,18 @@ export default function App() {
 
 const exportData = async () => {
   try {
-    setIsLoadingData(true);
+    setIsExporting(true);
     await exportToExcel();
   } catch (error: any) {
     alert('Failed to export data: ' + (error.message || 'Unknown error'));
   } finally {
-    setIsLoadingData(false);
+    setIsExporting(false);
   }
 };
 
 const exportFilteredData = async () => {
   try {
-    setIsLoadingData(true);
+    setIsExporting(true);
     await exportFilteredToExcel({
       category: filters.category !== 'All' ? filters.category : undefined,
       status: filters.status !== 'All' ? filters.status : undefined,
@@ -387,7 +388,7 @@ const exportFilteredData = async () => {
   } catch (error: any) {
     alert('Failed to export filtered data: ' + (error.message || 'Unknown error'));
   } finally {
-    setIsLoadingData(false);
+    setIsExporting(false);
   }
 };
 
@@ -458,19 +459,19 @@ const exportFilteredData = async () => {
                 <div className="flex gap-2">
                   <button 
                     onClick={exportData}
-                    disabled={isLoadingData}
+                    disabled={isExporting}
                     className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-full text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:shadow-soft transition-all disabled:opacity-50"
                   >
                     <Download size={16} />
                     <span className="hidden sm:inline">
-                      {isLoadingData ? 'Generating...' : t('Export Excel')}
+                      {isExporting ? 'Generating...' : t('Export Excel')}
                     </span>
                   </button>
                   
                   {(filters.category !== 'All' || filters.status !== 'All' || filters.priority !== 'All' || filters.dateRange !== 'All') && (
                     <button 
                       onClick={exportFilteredData}
-                      disabled={isLoadingData}
+                      disabled={isExporting}
                       className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-full text-sm font-semibold hover:bg-emerald-700 shadow-soft transition-all disabled:opacity-50"
                     >
                       <Download size={16} />

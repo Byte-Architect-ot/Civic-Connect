@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from typing import Dict
 import math
 
@@ -24,17 +24,33 @@ class DynamicScorer:
         scores['priority'] = priority_map.get(issue.get('priority', 'Medium'), 50)
         
         # 2. Upvote Score (normalized)
-        upvotes = issue.get('upvotes', 0)
-        scores['upvotes'] = min(upvotes * 5, 100)  # 20 upvotes = max score
+        upvotes = issue.get('upvotes', 0) or 0
+        try:
+            upvotes = int(upvotes)
+        except (ValueError, TypeError):
+            upvotes = 0
+        scores['upvotes'] = min(max(0, upvotes) * 5, 100)  # 20 upvotes = max score
         
         # 3. Age Score (older = more urgent if unresolved)
-        reported_at = datetime.fromisoformat(issue['reportedAt'].replace('Z', '+00:00'))
-        days_old = (datetime.now(reported_at.tzinfo) - reported_at).days
+        raw_date = issue.get('reportedAt') or issue.get('createdAt')
+        days_old = 0
+        if raw_date:
+            try:
+                date_str = str(raw_date).replace('Z', '+00:00')
+                reported_at = datetime.fromisoformat(date_str)
+                now = datetime.now(reported_at.tzinfo) if reported_at.tzinfo else datetime.now()
+                days_old = max(0, (now - reported_at).days)
+            except Exception:
+                days_old = 0
         scores['age'] = min(days_old * 10, 100)  # 10 days = max score
         
         # 4. Cluster Size Score (more duplicates = more urgent)
-        cluster_size = issue.get('clusterSize', 0)
-        scores['cluster_size'] = min(cluster_size * 15, 100)
+        cluster_size = issue.get('clusterSize', 0) or 0
+        try:
+            cluster_size = int(cluster_size)
+        except (ValueError, TypeError):
+            cluster_size = 0
+        scores['cluster_size'] = min(max(0, cluster_size) * 15, 100)
         
         # 5. Status Score
         status_map = {

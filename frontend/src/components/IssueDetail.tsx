@@ -239,7 +239,7 @@ export const IssueDetail: React.FC<IssueDetailProps> = ({
                 <div className="space-y-6 relative before:absolute before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
                   {issue.updates && issue.updates.length > 0 ? (
                     issue.updates.map((update, idx) => (
-                      <UpdateCard key={update.id} update={update} isLatest={idx === 0} />
+                      <UpdateCard key={update.id || update._id || `update-${idx}`} update={update} isLatest={idx === 0} />
                     ))
                   ) : (
                     <div className="pl-10 text-slate-400 text-sm italic py-8 bg-slate-50 rounded-2xl px-6">

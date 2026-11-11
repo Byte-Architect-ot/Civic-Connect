@@ -41,7 +41,8 @@ export interface CivicIssue {
 }
 
 export interface IssueUpdate {
-  id: string;
+  id?: string;
+  _id?: string;
   status: IssueStatus;
   comment: string;
   updatedAt: string;

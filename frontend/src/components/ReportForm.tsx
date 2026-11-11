@@ -35,7 +35,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
   // 🤖 ML STATE
   const [mlSuggestions, setMlSuggestions] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisDebounce, setAnalysisDebounce] = useState<NodeJS.Timeout | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,18 +72,16 @@ export const ReportForm: React.FC<ReportFormProps> = ({ isOpen, onClose, onSubmi
 
   // Debounced analysis
   useEffect(() => {
-    if (analysisDebounce) {
-      clearTimeout(analysisDebounce);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
 
-    const timeout = setTimeout(() => {
+    debounceTimerRef.current = setTimeout(() => {
       analyzeText(formData.title, formData.description);
     }, 1500); // Wait 1.5s after user stops typing
 
-    setAnalysisDebounce(timeout);
-
     return () => {
-      if (timeout) clearTimeout(timeout);
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, [formData.title, formData.description]);
 

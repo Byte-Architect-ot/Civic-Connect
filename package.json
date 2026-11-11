@@ -8,8 +8,8 @@
     "start:frontend": "cd frontend && npm run dev",
     "start:backend": "cd backend && npm start",
     "start:chatbot": "cd chatbot-service && npm start",
-    "start:ml": "cd ml-service && venv\\Scripts\\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
-    "install:all": "cd frontend && npm install && cd ../backend && npm install && cd ../chatbot-service && npm install && cd ../ml-service && python -m venv venv && venv\\Scripts\\activate && pip install -r requirements.txt"
+    "start:ml": "node scripts/start-ml.js",
+    "install:all": "node scripts/install-all.js"
   },
   "repository": {
     "type": "git",

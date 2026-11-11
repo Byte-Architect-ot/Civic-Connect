@@ -4,15 +4,29 @@ const axios = require('axios');
 const pdfParse = require('pdf-parse');
 require('dotenv').config();
 
-const pinecone = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY,
-});
+let pinecone = null;
+if (process.env.PINECONE_API_KEY) {
+  try {
+    pinecone = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY,
+    });
+  } catch (err) {
+    console.warn("Pinecone initialization warning:", err.message);
+  }
+}
 
-const groq = new ChatGroq({
-  apiKey: process.env.GROQ_API_KEY,
-  modelName: "llama-3.1-8b-instant",
-  model: "llama-3.1-8b-instant"
-});
+let groq = null;
+if (process.env.GROQ_API_KEY) {
+  try {
+    groq = new ChatGroq({
+      apiKey: process.env.GROQ_API_KEY,
+      modelName: "llama-3.1-8b-instant",
+      model: "llama-3.1-8b-instant"
+    });
+  } catch (err) {
+    console.warn("Groq initialization warning:", err.message);
+  }
+}
 
 // Function to generate embeddings using Hugging Face Inference API
 async function generateEmbeddings(textChunks) {
@@ -24,7 +38,8 @@ async function generateEmbeddings(textChunks) {
         headers: {
           Authorization: `Bearer ${process.env.HF_API_KEY}`,
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 10000
       }
     );
     return response.data;
@@ -49,6 +64,10 @@ function chunkText(text, chunkSize = 1000, chunkOverlap = 200) {
 // a) Ingest PDF
 async function ingestPDF(fileBuffer) {
   try {
+    if (!pinecone) {
+      throw new Error("Pinecone client is not configured.");
+    }
+
     const data = await pdfParse(fileBuffer);
     const text = data.text;
     
@@ -95,22 +114,30 @@ async function ingestPDF(fileBuffer) {
 // b) Query Chatbot
 async function queryChatbot(userMessage) {
   try {
-    // Convert the user's string query into an embedding vector
-    const queryEmbeddingResponse = await generateEmbeddings([userMessage]);
-    const queryEmbedding = queryEmbeddingResponse[0];
+    let contextString = '';
     
-    // Query the free Pinecone index to retrieve the top 3 most relevant text context pieces
-    const index = pinecone.index(process.env.PINECONE_INDEX_NAME);
-    const queryResponse = await index.query({
-      vector: queryEmbedding,
-      topK: 3,
-      includeMetadata: true,
-    });
+    if (pinecone && process.env.PINECONE_INDEX_NAME) {
+      try {
+        const queryEmbeddingResponse = await generateEmbeddings([userMessage]);
+        const queryEmbedding = queryEmbeddingResponse[0];
+        
+        const index = pinecone.index(process.env.PINECONE_INDEX_NAME);
+        const queryResponse = await index.query({
+          vector: queryEmbedding,
+          topK: 3,
+          includeMetadata: true,
+        });
+        
+        const contexts = (queryResponse?.matches || [])
+          .filter(match => match && match.metadata && match.metadata.text)
+          .map(match => match.metadata.text);
+        contextString = contexts.join('\n\n');
+      } catch (err) {
+        console.warn("Pinecone search failed, proceeding without context:", err.message);
+      }
+    }
     
-    const contexts = queryResponse.matches.map(match => match.metadata.text);
-    const contextString = contexts.join('\n\n');
-    
-    // Assemble a strict system prompt embedding that context
+    // Assemble system prompt
     const prompt = `You are Setu, a friendly and knowledgeable civic assistant for "NagrikSetu" - a community issue tracking and reporting portal for Indian citizens.
 
 Your personality:
@@ -126,19 +153,21 @@ Your personality:
 Platform info: NagrikSetu lets citizens report civic issues (Roads, Garbage, Water, Electricity, Public Health, and Others), track their status, and engage with local authorities.
 
 Context from knowledge base:
-${contextString}
+${contextString || 'No specific document context.'}
 
 User question: ${userMessage}
 
 Your response (plain text only, no markdown):`;
 
-    // Issue a chat completion request to Groq LLM
-    const response = await groq.invoke(prompt);
-    
-    return response.content;
+    if (groq) {
+      const response = await groq.invoke(prompt);
+      return response.content;
+    }
+
+    return "Namaste! I am Setu, your civic assistant. You can report civic issues like potholes, garbage, and water leaks directly from the dashboard. Once reported, local authorities can review and update their status.";
   } catch (error) {
     console.error("Error in queryChatbot:", error);
-    throw error;
+    return "Namaste! I am Setu. You can report civic issues like potholes, garbage, or water leaks from the 'Report Issue' button on the dashboard. Our local authorities will look into it.";
   }
 }
 

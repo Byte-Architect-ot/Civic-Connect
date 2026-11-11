@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-export const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+export const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '';
 // Use a relative path so all requests go through Vite's proxy (no CORS)
 const API_PATH = import.meta.env.VITE_API_PATH || '/api';
 
@@ -230,7 +230,7 @@ export const exportToExcel = async (): Promise<void> => {
   if (!token) throw new Error('No authentication token');
 
   try {
-    const response = await fetch(`/api/export/excel`, {
+    const response = await fetch(`${API_PATH}/export/excel`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -268,7 +268,7 @@ export const exportFilteredToExcel = async (filters: {
   if (!token) throw new Error('No authentication token');
 
   try {
-    const response = await fetch(`/api/export/excel/filtered`, {
+    const response = await fetch(`${API_PATH}/export/excel/filtered`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

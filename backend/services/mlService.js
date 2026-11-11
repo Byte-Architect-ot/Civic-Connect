@@ -8,7 +8,7 @@ const mlService = {
       const response = await axios.post(`${ML_SERVICE_URL}/api/ml/categorize/analyze`, {
         title,
         description
-      });
+      }, { timeout: 10000 });
       return response.data;
     } catch (error) {
       console.error('Error analyzing issue with ML:', error.message);
@@ -26,7 +26,8 @@ const mlService = {
         method: 'POST',
         url: `https://detect.roboflow.com/civic-issues-qj5pb/2?api_key=${apiKey}`,
         data: base64Image,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeout: 10000
       });
 
       const predictions = response.data.predictions || [];
@@ -52,7 +53,7 @@ const mlService = {
         lat,
         lng,
         existingIssues
-      });
+      }, { timeout: 5000 });
       return response.data;
     } catch (error) {
       console.error('Error checking duplicates with ML:', error.message);
@@ -61,11 +62,20 @@ const mlService = {
   },
 
   calculateUrgency: async (hazard) => {
-    // We will assume there's an urgency calculation endpoint in ml-service,
-    // though it might not exist yet. Let's return a default if it fails.
     try {
-      // Mocked calculation for now since there's no endpoint in ml-service for calculateUrgency
-      // Or we can just calculate it here
+      const dateVal = hazard.reportedAt || hazard.createdAt || new Date();
+      const reportedAt = dateVal instanceof Date ? dateVal.toISOString() : String(dateVal);
+      const response = await axios.post(`${ML_SERVICE_URL}/api/ml/priority/calculate-urgency`, {
+        id: hazard.id || hazard._id?.toString() || 'temp',
+        priority: hazard.priority || 'Medium',
+        upvotes: hazard.upvotes || 0,
+        reportedAt,
+        status: hazard.status || 'Pending',
+        clusterSize: hazard.clusterSize || 0
+      }, { timeout: 3000 });
+      return response.data;
+    } catch (error) {
+      // Local fallback calculation
       let score = 0;
       if (hazard.priority === 'Critical') score += 40;
       else if (hazard.priority === 'High') score += 30;
@@ -76,9 +86,6 @@ const mlService = {
       score += (hazard.clusterSize || 0) * 10;
       
       return { urgency_score: Math.min(score, 100) };
-    } catch (error) {
-      console.error('Error calculating urgency:', error.message);
-      return null;
     }
   }
 };

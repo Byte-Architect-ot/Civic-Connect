@@ -7,19 +7,25 @@ router = APIRouter()
 scorer = DynamicScorer()
 
 class IssueForScoring(BaseModel):
-    id: str
-    priority: str
-    upvotes: int
-    reportedAt: str
-    status: str
+    id: Optional[str] = "temp"
+    priority: Optional[str] = "Medium"
+    upvotes: Optional[int] = 0
+    reportedAt: Optional[str] = None
+    status: Optional[str] = "Pending"
     clusterSize: Optional[int] = 0
+
+def dump_model(model: BaseModel) -> dict:
+    if hasattr(model, 'model_dump'):
+        return model.model_dump()
+    return model.dict()
 
 @router.post("/calculate-urgency")
 async def calculate_urgency(issue: IssueForScoring):
     """
     Calculate dynamic urgency score for a single issue
     """
-    result = scorer.calculate_urgency_score(issue.dict())
+    data = dump_model(issue)
+    result = scorer.calculate_urgency_score(data)
     return result
 
 @router.post("/rank-issues")
@@ -30,7 +36,8 @@ async def rank_issues(issues: List[IssueForScoring]):
     scored_issues = []
     
     for issue in issues:
-        score_data = scorer.calculate_urgency_score(issue.dict())
+        data = dump_model(issue)
+        score_data = scorer.calculate_urgency_score(data)
         scored_issues.append({
             'id': issue.id,
             'urgencyScore': score_data['urgency_score'],

@@ -46,8 +46,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
       newErrors.phone = 'Please enter a valid phone number';
     }
 
-    if (role === 'Staff' && !formData.referralKey) {
-      newErrors.referralKey = 'Admin key is required for authority signup/login';
+    if (mode === 'signup' && role === 'Staff' && !formData.referralKey) {
+      newErrors.referralKey = 'Admin key is required for authority registration';
     }
 
     setErrors(newErrors);
@@ -297,7 +297,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               </div>
             )}
 
-            {role === 'Staff' && (
+            {role === 'Staff' && mode === 'signup' && (
               <div className="space-y-1">
                 <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide ml-1">
                   {t('Admin Key')} <span className="text-rose-500">*</span>
